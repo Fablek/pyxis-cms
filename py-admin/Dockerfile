@@ -5,16 +5,18 @@ RUN apt-get update && apt-get install -y \
     libpng-dev \
     libjpeg-dev \
     libfreetype6-dev \
-    zip \
+    libicu-dev \
     libzip-dev \
+    libpq-dev \
+    zip \
     unzip \
     git \
-    curl \
-    libpq-dev
+    curl
 
 # Installing PHP extensions (including pdo_pgsql for Postgres)
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install pdo pdo_pgsql gd zip
+    && docker-php-ext-configure intl \
+    && docker-php-ext-install pdo pdo_pgsql gd zip intl bcmath
 
 # Composer installation
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
