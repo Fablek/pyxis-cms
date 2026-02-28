@@ -1,0 +1,38 @@
+services:
+  # Backend: Laravel (py-admin)
+  admin:
+    build:
+      context: ./py-admin
+      dockerfile: Dockerfile
+    volumes:
+      - ./py-admin:/var/www/html
+      - ./py-content:/var/www/html/py-content
+    environment:
+      - APP_ENV=local
+      - DB_CONNECTION=pgsql
+      - DB_HOST=db
+    depends_on:
+      - db
+
+  # Frontend: Next.js (py-view)
+  view:
+    build:
+      context: ./py-view
+    volumes:
+      - ./py-view:/app
+      - ./py-content:/app/py-content
+    ports:
+      - "3000:3000"
+
+  # Baza danych: PostgreSQL
+  db:
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_DB=pyxis_db
+      - POSTGRES_USER=pyxis_user
+      - POSTGRES_PASSWORD=secret
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+volumes:
+  db_data:

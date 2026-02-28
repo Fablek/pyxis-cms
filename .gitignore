@@ -1,0 +1,16 @@
+# System
+.DS_Store
+node_modules/
+vendor/
+
+# Laravel
+py-admin/.env
+py-admin/storage/*.key
+py-admin/public/storage
+
+# Next.js
+py-view/.next/
+py-view/.env.local
+
+# Docker & DB
+.docker-data/
