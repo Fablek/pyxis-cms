@@ -1,8 +1,24 @@
 <?php
 return [
+    'pages' => [
+        'label' => 'Page',
+        'plural_label' => 'Pages',
+        'sections' => ['general' => 'General Information'],
+        'fields' => [
+            'title' => 'Page Title',
+            'slug' => 'URL Address (Slug)',
+            'status' => 'Status',
+            'author' => 'Author',
+        ],
+        'status' => [
+            'draft' => 'Draft',
+            'published' => 'Published',
+        ],
+    ],
     'nav' => [
         'users' => 'Users',
         'settings' => 'Settings',
+        'pages' => 'Pages',
     ],
     'users' => [
         'label' => 'User',

@@ -1,8 +1,24 @@
 <?php
 return [
+    'pages' => [
+        'label' => 'Stronę',
+        'plural_label' => 'Strony',
+        'sections' => ['general' => 'Informacje o stronie'],
+        'fields' => [
+            'title' => 'Tytuł strony',
+            'slug' => 'Adres URL (Slug)',
+            'status' => 'Status',
+            'author' => 'Autor',
+        ],
+        'status' => [
+            'draft' => 'Szkic',
+            'published' => 'Opublikowano',
+        ],
+    ],
     'nav' => [
         'users' => 'Użytkownicy',
         'settings' => 'Ustawienia',
+        'pages' => 'Strony',
     ],
     'users' => [
         'label' => 'Użytkownik',
