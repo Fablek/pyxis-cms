@@ -3,16 +3,30 @@ return [
     'pages' => [
         'label' => 'Stronę',
         'plural_label' => 'Strony',
-        'sections' => ['general' => 'Informacje o stronie'],
+        'sections' => [
+            'publish' => 'Opublikuj',
+            'attributes' => 'Atrybuty strony',
+        ],
         'fields' => [
-            'title' => 'Tytuł strony',
-            'slug' => 'Adres URL (Slug)',
+            'title' => 'Tytuł',
+            'slug' => 'Slug (URL)',
             'status' => 'Status',
+            'parent' => 'Strona nadrzędna',
             'author' => 'Autor',
         ],
         'status' => [
             'draft' => 'Szkic',
             'published' => 'Opublikowano',
+        ],
+        'actions' => [
+            'save' => 'Zapisz zmiany',
+            'delete' => 'Usuń',
+        ],
+        'modals' => [
+            'delete_confirm' => 'Czy na pewno chcesz usunąć tę stronę?',
+        ],
+        'placeholders' => [
+            'none_root' => 'Brak (strona główna)',
         ],
     ],
     'nav' => [

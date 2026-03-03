@@ -10,10 +10,21 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Forms\Set;
 use Illuminate\Support\Str;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Group;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Split;
+use Filament\Forms\Components\Actions;
 
 class PageResource extends Resource
 {
@@ -40,29 +51,75 @@ class PageResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Section::make(__('admin.pages.sections.general'))
-                    ->schema([
-                        Forms\Components\TextInput::make('title')
+                Split::make([
+
+                    // Left column
+                    Section::make([
+                        TextInput::make('title')
                             ->label(__('admin.pages.fields.title'))
                             ->required()
                             ->live(onBlur: true)
-                            ->afterStateUpdated(fn (Set $set, ?string $state) => $set('slug', Str::slug($state))),
-
-                        Forms\Components\TextInput::make('slug')
+                            ->afterStateUpdated(fn ($set, $state) => $set('slug', \Illuminate\Support\Str::slug($state))),
+                        
+                        TextInput::make('slug')
                             ->label(__('admin.pages.fields.slug'))
                             ->required()
                             ->unique(ignoreRecord: true),
+                        
+                        // Builder blocks here
+                    ]),
 
-                        Forms\Components\Select::make('status')
-                            ->label(__('admin.pages.fields.status'))
-                            ->options([
-                                'draft' => __('admin.pages.status.draft'),
-                                'published' => __('admin.pages.status.published'),
-                            ])
-                            ->default('draft')
-                            ->native(false)
-                            ->required(),
-                    ])->columns(2),
+                    // Right column
+                    Group::make([
+
+                        // Section (Public)
+                        Section::make(__('admin.pages.sections.publish'))
+                            ->schema([
+                                Select::make('status')
+                                    ->label(__('admin.pages.fields.status'))
+                                    ->options([
+                                        'draft' => __('admin.pages.status.draft'),
+                                        'published' => __('admin.pages.status.published'),
+                                    ])
+                                    ->default('draft')
+                                    ->native(false)
+                                    ->required(),
+
+                                Actions::make([
+                                    // Button save
+                                    Forms\Components\Actions\Action::make('save')
+                                        ->label(__('admin.pages.actions.save'))
+                                        ->color('primary')
+                                        ->submit('save'),
+
+                                    // Button delete
+                                    Forms\Components\Actions\Action::make('delete')
+                                        ->label(__('admin.pages.actions.delete'))
+                                        ->color('danger')
+                                        ->icon('heroicon-o-trash')
+                                        ->requiresConfirmation() // This will trigger a modal asking for confirmation
+                                        ->modalHeading(__('admin.pages.modals.delete_confirm'))
+                                        ->hidden(fn ($operation) => $operation === 'create') // We hide while creating
+                                        ->action(function ($record, $livewire) {
+                                            $record->delete();
+                                            // After deletion, we return to the list of pages
+                                            return redirect($livewire->getResource()::getUrl('index'));
+                                        }),
+                                ])->alignEnd(),
+                            ]),
+                        
+                        // Section: Atributes
+                        Section::make(__('admin.pages.sections.attributes'))
+                            ->schema([
+                                Select::make('parent_id')
+                                    ->label(__('admin.pages.fields.parent'))
+                                    ->relationship('parent', 'title')
+                                    ->searchable()
+                                    ->placeholder(__('admin.pages.placeholders.none_root')),
+                            ]),
+
+                    ])->grow(false), // This column will not expand (fixed width)
+                ])->from('md')->columnSpanFull(), // The column layout is enabled from tablets (md) upwards
             ]);
     }
 
@@ -70,17 +127,17 @@ class PageResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('title')
+                TextColumn::make('title')
                     ->label(__('admin.pages.fields.title'))
                     ->searchable()
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('slug')
+                TextColumn::make('slug')
                     ->label(__('admin.pages.fields.slug'))
                     ->icon('heroicon-o-link')
                     ->color('gray'),
 
-                Tables\Columns\TextColumn::make('status')
+                TextColumn::make('status')
                     ->label(__('admin.pages.fields.status'))
                     ->badge()
                     ->formatStateUsing(fn (string $state): string => __("admin.pages.status.{$state}"))
@@ -90,23 +147,23 @@ class PageResource extends Resource
                         default => 'gray',
                     }),
 
-                Tables\Columns\TextColumn::make('user.name')
+                TextColumn::make('user.name')
                     ->label(__('admin.pages.fields.author'))
                     ->sortable(),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('status')
+                SelectFilter::make('status')
                     ->options([
-                        'draft' => 'Draft',
-                        'published' => 'Published',
+                        'draft' => __('admin.pages.status.draft'),
+                        'published' => __('admin.pages.status.published'),
                     ]),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                EditAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }

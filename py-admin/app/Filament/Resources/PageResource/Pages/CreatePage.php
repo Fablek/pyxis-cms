@@ -16,4 +16,9 @@ class CreatePage extends CreateRecord
     
         return $data;
     }
+
+    protected function getFormActions(): array
+    {
+        return [];
+    }
 }

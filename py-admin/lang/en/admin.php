@@ -3,16 +3,30 @@ return [
     'pages' => [
         'label' => 'Page',
         'plural_label' => 'Pages',
-        'sections' => ['general' => 'General Information'],
+        'sections' => [
+            'publish' => 'Publish',
+            'attributes' => 'Page Attributes',
+        ],
         'fields' => [
-            'title' => 'Page Title',
-            'slug' => 'URL Address (Slug)',
+            'title' => 'Title',
+            'slug' => 'Slug (URL)',
             'status' => 'Status',
+            'parent' => 'Parent Page',
             'author' => 'Author',
         ],
         'status' => [
             'draft' => 'Draft',
             'published' => 'Published',
+        ],
+        'actions' => [
+            'save' => 'Save Changes',
+            'delete' => 'Delete',
+        ],
+        'modals' => [
+            'delete_confirm' => 'Are you sure you want to delete this page?',
+        ],
+        'placeholders' => [
+            'none_root' => 'None (Root page)',
         ],
     ],
     'nav' => [
