@@ -59,12 +59,24 @@ class PageResource extends Resource
                             ->label(__('admin.pages.fields.title'))
                             ->required()
                             ->live(onBlur: true)
-                            ->afterStateUpdated(fn ($set, $state) => $set('slug', \Illuminate\Support\Str::slug($state))),
+                            ->afterStateUpdated(fn ($set, $state) => $set('slug', Str::slug($state))),
                         
                         TextInput::make('slug')
                             ->label(__('admin.pages.fields.slug'))
                             ->required()
-                            ->unique(ignoreRecord: true),
+                            ->unique(ignoreRecord: true)
+                            ->prefix(function (Forms\Get $get) {
+                                $parentId = $get('parent_id');
+                                if ($parentId) {
+                                    // Download the parent servant from the database
+                                    $parent = \App\Models\Page::find($parentId);
+                                    return $parent ? '/' . $parent->slug . '/' : '/';
+                                }
+                                return '/';
+                            })
+                            // Prevent the user from entering slashes,
+                            // because the prefix already adds them automatically
+                            ->afterStateUpdated(fn ($set, $state) => $set('slug', Str::slug($state))),
                         
                         // Builder blocks here
                     ]),
@@ -115,7 +127,8 @@ class PageResource extends Resource
                                     ->label(__('admin.pages.fields.parent'))
                                     ->relationship('parent', 'title')
                                     ->searchable()
-                                    ->placeholder(__('admin.pages.placeholders.none_root')),
+                                    ->placeholder(__('admin.pages.placeholders.none_root'))
+                                    ->live(),
                             ]),
 
                     ])->grow(false), // This column will not expand (fixed width)
