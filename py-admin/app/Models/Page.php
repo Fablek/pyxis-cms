@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -19,6 +20,7 @@ class Page extends Model
         'seo',
         'status',
         'user_id',
+        'parent_id',
     ];
 
     protected $casts = [
@@ -39,5 +41,27 @@ class Page extends Model
     public function children(): HasMany
     {
         return $this->hasMany(Page::class, 'parent_id');
+    }
+
+    /**
+     * Calculates the full URL path of a page based on its parent hierarchy.
+     * Example: /about-us/team/jan-smith
+     */
+    protected function fullUrl(): Attribute
+    {
+        return Attribute::make(
+            get: function() {
+                $slugs = collect([$this->slug]);
+                $current = $this;
+
+                // Recursive tree traversal
+                while ($current->parent_id && $parent = $current->parent) {
+                    $slugs->prepend($parent->slug);
+                    $current = $parent;
+                }
+
+                return '/' . $slugs->implode('/');
+            },
+        );
     }
 }
