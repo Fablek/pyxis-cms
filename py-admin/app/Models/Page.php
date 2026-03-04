@@ -19,6 +19,8 @@ class Page extends Model
         'content',
         'seo',
         'status',
+        'visibility',
+        'password',
         'user_id',
         'parent_id',
     ];

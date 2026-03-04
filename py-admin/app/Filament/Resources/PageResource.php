@@ -96,6 +96,25 @@ class PageResource extends Resource
                                     ->default('draft')
                                     ->native(false)
                                     ->required(),
+                                
+                                Select::make('visibility')
+                                    ->label(__('admin.pages.fields.visibility'))
+                                    ->options([
+                                        'public' => __('admin.pages.visibility.public'),
+                                        'private' => __('admin.pages.visibility.private'),
+                                        'password' => __('admin.pages.visibility.password'),
+                                    ])
+                                    ->default('public')
+                                    ->native(false)
+                                    ->required()
+                                    ->live(),
+
+                                TextInput::make('password')
+                                    ->label(__('admin.pages.fields.password'))
+                                    ->password()
+                                    ->revealable()
+                                    ->requiredIf('visibility', 'password')
+                                    ->visible(fn ($get) => $get('visibility') === 'password'),
 
                                 Actions::make([
                                     // Button save
@@ -158,6 +177,23 @@ class PageResource extends Resource
                         'published' => 'success',
                         'draft' => 'warning',
                         default => 'gray',
+                    }),
+                
+                TextColumn::make('visibility')
+                    ->label(__('admin.pages.fields.visibility'))
+                    ->badge()
+                    ->formatStateUsing(fn (string $state): string => __("admin.pages.visibility.{$state}"))
+                    ->color(fn (string $state): string => match ($state) {
+                        'public' => 'success',
+                        'private' => 'gray',
+                        'password' => 'info',
+                        default => 'gray',
+                    })
+                    ->icon(fn (string $state): string => match ($state) {
+                        'public' => 'heroicon-o-globe-alt',
+                        'private' => 'heroicon-o-lock-closed',
+                        'password' => 'heroicon-o-key',
+                        default => 'heroicon-o-globe-alt',
                     }),
 
                 TextColumn::make('user.name')

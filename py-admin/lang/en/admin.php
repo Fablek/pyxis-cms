@@ -11,12 +11,19 @@ return [
             'title' => 'Title',
             'slug' => 'Slug (URL)',
             'status' => 'Status',
+            'visibility' => 'Visibility',
+            'password' => 'Access Password',
             'parent' => 'Parent Page',
             'author' => 'Author',
         ],
         'status' => [
             'draft' => 'Draft',
             'published' => 'Published',
+        ],
+        'visibility' => [
+            'public' => 'Public',
+            'private' => 'Private',
+            'password' => 'Password Protected',
         ],
         'actions' => [
             'save' => 'Save Changes',

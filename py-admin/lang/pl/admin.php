@@ -11,12 +11,19 @@ return [
             'title' => 'Tytuł',
             'slug' => 'Slug (URL)',
             'status' => 'Status',
+            'visibility' => 'Widoczność',
+            'password' => 'Hasło dostępu',
             'parent' => 'Strona nadrzędna',
             'author' => 'Autor',
         ],
         'status' => [
             'draft' => 'Szkic',
             'published' => 'Opublikowano',
+        ],
+        'visibility' => [
+            'public' => 'Publiczne',
+            'private' => 'Prywatne',
+            'password' => 'Chronione hasłem',
         ],
         'actions' => [
             'save' => 'Zapisz zmiany',
