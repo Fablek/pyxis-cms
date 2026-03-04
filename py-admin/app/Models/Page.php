@@ -21,6 +21,7 @@ class Page extends Model
         'status',
         'visibility',
         'password',
+        'published_at',
         'user_id',
         'parent_id',
     ];
@@ -28,6 +29,7 @@ class Page extends Model
     protected $casts = [
         'content' => 'array',
         'seo' => 'array',
+        'published_at' => 'datetime',
     ];
 
     public function user(): BelongsTo
@@ -65,5 +67,19 @@ class Page extends Model
                 return '/' . $slugs->implode('/');
             },
         );
+    }
+
+    /**
+     * Check if the resource is currently live and visible to users.
+     * * The resource is considered "live" if:
+     * 1. The status is explicitly set to 'published'.
+     * 2. The publication date is either not set (null) or is in the past/present.
+     *
+     * @return bool
+     */
+    public function isLive(): bool
+    {
+        return $this->status === 'published' && 
+            ($this->published_at === null || $this->published_at <= now());
     }
 }

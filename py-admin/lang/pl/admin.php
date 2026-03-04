@@ -13,12 +13,14 @@ return [
             'status' => 'Status',
             'visibility' => 'Widoczność',
             'password' => 'Hasło dostępu',
+            'published_at' => 'Data publikacji',
             'parent' => 'Strona nadrzędna',
             'author' => 'Autor',
         ],
         'status' => [
             'draft' => 'Szkic',
             'published' => 'Opublikowano',
+            'scheduled' => 'Zaplanowano',
         ],
         'visibility' => [
             'public' => 'Publiczne',

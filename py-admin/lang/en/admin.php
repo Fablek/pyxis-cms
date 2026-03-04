@@ -13,12 +13,14 @@ return [
             'status' => 'Status',
             'visibility' => 'Visibility',
             'password' => 'Access Password',
+            'published_at' => 'Published at',
             'parent' => 'Parent Page',
             'author' => 'Author',
         ],
         'status' => [
             'draft' => 'Draft',
             'published' => 'Published',
+            'scheduled' => 'Scheduled',
         ],
         'visibility' => [
             'public' => 'Public',

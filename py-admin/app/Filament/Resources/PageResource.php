@@ -25,6 +25,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Split;
 use Filament\Forms\Components\Actions;
+use Filament\Forms\Components\DateTimePicker;
 
 class PageResource extends Resource
 {
@@ -109,6 +110,11 @@ class PageResource extends Resource
                                     ->required()
                                     ->live(),
 
+                                DateTimePicker::make('published_at')
+                                    ->label(__('admin.pages.fields.published_at'))
+                                    ->default(now()) // Default now
+                                    ->native(false),
+
                                 TextInput::make('password')
                                     ->label(__('admin.pages.fields.password'))
                                     ->password()
@@ -172,11 +178,21 @@ class PageResource extends Resource
                 TextColumn::make('status')
                     ->label(__('admin.pages.fields.status'))
                     ->badge()
-                    ->formatStateUsing(fn (string $state): string => __("admin.pages.status.{$state}"))
-                    ->color(fn (string $state): string => match ($state) {
-                        'published' => 'success',
-                        'draft' => 'warning',
-                        default => 'gray',
+                    ->formatStateUsing(function (string $state, Page $record): string {
+                        if ($state === 'published' && $record->published_at > now()) {
+                            return __('admin.pages.status.scheduled');
+                        }
+                        return __("admin.pages.status.{$state}");
+                    })
+                    ->color(function (string $state, Page $record): string {
+                        if ($state === 'published' && $record->published_at > now()) {
+                            return 'info';
+                        }
+                        return match ($state) {
+                            'published' => 'success',
+                            'draft' => 'warning',
+                            default => 'gray',
+                        };
                     }),
                 
                 TextColumn::make('visibility')
@@ -195,6 +211,11 @@ class PageResource extends Resource
                         'password' => 'heroicon-o-key',
                         default => 'heroicon-o-globe-alt',
                     }),
+
+                TextColumn::make('published_at')
+                    ->label(__('admin.pages.fields.published_at'))
+                    ->dateTime('d.m.Y')
+                    ->sortable(),
 
                 TextColumn::make('user.name')
                     ->label(__('admin.pages.fields.author'))
