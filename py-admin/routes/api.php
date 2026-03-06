@@ -1,8 +1,10 @@
 <?php
 
 use Illuminate\Http\Request;
+use App\Http\Controllers\Api\PageController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
+// Catch-all route for parties.
+// '{slug}' with the '.*' condition will allow forward slashes to be passed in the address.
+Route::get('/pages/{slug}', [PageController::class, 'show'])
+    ->where('slug', '.*');

@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use Attribute;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -54,8 +54,10 @@ class Page extends Model
     protected function fullUrl(): Attribute
     {
         return Attribute::make(
-            get: function() {
-                $slugs = collect([$this->slug]);
+            get: function(mixed $value, array $attributes) {
+                $currentSlug = $attributes['slug'] ?? '';
+                $slugs = collect([$currentSlug]);
+
                 $current = $this;
 
                 // Recursive tree traversal
