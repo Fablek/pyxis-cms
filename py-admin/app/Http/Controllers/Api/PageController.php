@@ -5,110 +5,63 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Page;
 use App\Models\Setting;
+use App\Http\Resources\PageResource;
 use Illuminate\Http\JsonResponse;
 
 class PageController extends Controller
 {
-    public function show(?string $slug = null): JsonResponse
+    public function show(?string $slug = null)
     {
-        if (empty($slug) || $slug === '/') {
-            $homepageId = Setting::get('homepage_id');
+        $homepageId = Setting::get('homepage_id');
 
-            if (!$homepageId) {
-                return response()->json(['message' => 'Homepage not configured'], 404);
-            }
+        // Choosing the right site
+        $page = $this->resolvePage($slug, $homepageId);
 
-            $page = Page::find($homepageId);
-
-            // If homepage record exist
-            if (!$page) {
-                return response()->json(['message' => 'Homepage record missing'], 404);
-            }
-
-            return $this->renderPageResponse($page, true);
-        }
-
-        // Break the slug into pieces to extract the last segment
-        $segments = explode('/', $slug);
-        $lastSegment = end($segments);
-
-        // Looking for the page after the last segment
-        // Immediately filter out what is supposed to be hidden from the world
-        $page = Page::with('parent')
-            ->where('slug', $lastSegment)
-            ->first();
-
-        // Validation: Page exist?
+        // Basic Validations (Quick Exits)
         if (!$page) {
             return response()->json(['message' => 'Page not found'], 404);
         }
 
-        // If user wants to access the homepage by slug
-        $homepageId = Setting::get('homepage_id');
-        if ((string)$page->id === (string)$homepageId) {
-            return response()->json(['message' => 'This is the homepage, use / root path'], 404);
+        // Blocking access to the home page by its slug
+        if ($slug && (string)$page->id === (string)$homepageId) {
+            return response()->json(['message' => 'Use root path for homepage'], 404);
         }
 
-        // Hierarchy Validation:
-        // Check if the calculated full_url matches what the user entered. 
-        // This prevents someone from entering /zespol instead of /about-us/zespol.
-        $calculatedPath = trim($page->full_url, '/');
-        $requestedPath = trim($slug, '/');
-
-        if ($calculatedPath !== $requestedPath) {
-            return response()->json([
-                'message' => 'Page not found at this path',
-                'debug' => [
-                    'expected' => $calculatedPath,
-                    'received' => $requestedPath
-                ]
-            ], 404);
+        // Path validation (for subpages only)
+        if ($slug && trim($page->full_url, '/') !== trim($slug, '/')) {
+            return response()->json(['message' => 'Path mismatch'], 404);
         }
 
-        // Visibility Validation:
-        // For now, we're blocking 'private' until we can log in, but child is published it should be visible
+        // Parent validation
         if (!$this->allParentsPublished($page)) {
             return response()->json(['message' => 'One of the parent pages is not published'], 404);
         }
 
-        // Return clean data for the Frontend
-        return response()->json([
-            'id' => $page->id,
-            'title' => $page->title,
-            'content' => $page->content,
-            'seo' => $page->seo,
-            'full_url' => $page->full_url,
-            'published_at' => $page->published_at,
-            'is_password_protected' => $page->visibility === 'password',
-        ]);
+        // Returning data from Resource
+        return new PageResource($page);
     }
 
-    /**
-     * Formats a unified JSON response for the frontend.
-     */
-    private function renderPageResponse(Page $page, bool $isHomepage = false): JsonResponse
+    private function resolvePage(?string $slug, ?string $homepageId): ?Page
     {
-        return response()->json([
-            'id' => $page->id,
-            'title' => $page->title,
-            'content' => $page->content,
-            'seo' => $page->seo,
-            'full_url' => $isHomepage ? '/' : $page->full_url,
-            'published_at' => $page->published_at,
-            'is_password_protected' => $page->visibility === 'password',
-        ]);
+        if (empty($slug) || $slug === '/') {
+            return $homepageId ? Page::find($homepageId) : null;
+        }
+
+        $lastSegment = collect(explode('/', $slug))->last();
+
+        return Page::with('parent')
+            ->where('slug', $lastSegment)
+            ->first();
     }
 
     /**
      * Recursively checks if each parent up the tree is "live"
      */
-    private function allParentsPublished($page) : bool 
+    private function allParentsPublished($page): bool 
     {
         $current = $page->parent;
         while ($current) {
-            if (!$current->isLive()) {
-                return false;
-            }
+            if (!$current->isLive()) return false;
             $current = $current->parent;
         }
         return true;

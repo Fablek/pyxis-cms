@@ -5,10 +5,13 @@ import { notFound } from 'next/navigation';
  * Defines the contract between the Laravel API and the Next.js Frontend.
  */
 interface PageData {
+  id: string; // UUID
   title: string;
-  content: any; // Will be typed specifically once we implement the Block Builder
+  content: any;
   full_url: string;
   is_password_protected: boolean;
+  published_at: string;
+  seo: any;
 }
 
 /**
@@ -33,7 +36,10 @@ async function getPageData(slugArray: string[] | undefined): Promise<PageData | 
     });
 
     if (!res.ok) return null;
-    return await res.json();
+
+    const json = await res.json();
+
+    return json.data;
   } catch (error) {
     // Log connection issues to the server console for debugging.
     console.error("❌ API Fetch Error:", error);
@@ -49,6 +55,7 @@ export default async function Page(props: { params: Promise<{ slug?: string[] }>
   // In Next.js 15/16, 'params' is a Promise and must be explicitly awaited.
   const { slug } = await props.params;
   const data = await getPageData(slug);
+  console.log(data);
 
   // Trigger the built-in Next.js 404 page if the slug doesn't exist in the database.
   if (!data) notFound();
