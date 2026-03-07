@@ -18,7 +18,6 @@ class PageController extends Controller
         // Immediately filter out what is supposed to be hidden from the world
         $page = Page::with('parent')
             ->where('slug', $lastSegment)
-            ->where('status', 'published')
             ->first();
 
         // 3. Validation: Page exist?
