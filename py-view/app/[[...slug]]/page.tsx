@@ -17,8 +17,7 @@ interface PageData {
  */
 async function getPageData(slugArray: string[] | undefined): Promise<PageData | null> {
   // Convert ['parent', 'child'] array into a 'parent/child' string. 
-  // If the array is empty (root route), default to 'home'.
-  const slug = slugArray?.length ? slugArray.join('/') : 'home';
+  const slug = slugArray?.length ? slugArray.join('/') : '';
   
   // Use the Docker service name 'admin' for internal container communication.
   const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://admin:8000/api';
