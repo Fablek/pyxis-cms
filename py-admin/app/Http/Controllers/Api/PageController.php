@@ -24,45 +24,51 @@ class PageController extends Controller
             if (!$page) {
                 return response()->json(['message' => 'Homepage record missing'], 404);
             }
-        } 
-        // Subpages
-        else {
-            // Break the slug into pieces to extract the last segment
-            $segments = explode('/', $slug);
-            $lastSegment = end($segments);
 
-            // Looking for the page after the last segment
-            // Immediately filter out what is supposed to be hidden from the world
-            $page = Page::with('parent')
-                ->where('slug', $lastSegment)
-                ->first();
+            return $this->renderPageResponse($page, true);
+        }
 
-            // Validation: Page exist?
-            if (!$page) {
-                return response()->json(['message' => 'Page not found'], 404);
-            }
+        // Break the slug into pieces to extract the last segment
+        $segments = explode('/', $slug);
+        $lastSegment = end($segments);
 
-            // Hierarchy Validation:
-            // Check if the calculated full_url matches what the user entered. 
-            // This prevents someone from entering /zespol instead of /about-us/zespol.
-            $calculatedPath = trim($page->full_url, '/');
-            $requestedPath = trim($slug, '/');
+        // Looking for the page after the last segment
+        // Immediately filter out what is supposed to be hidden from the world
+        $page = Page::with('parent')
+            ->where('slug', $lastSegment)
+            ->first();
 
-            if ($calculatedPath !== $requestedPath) {
-                return response()->json([
-                    'message' => 'Page not found at this path',
-                    'debug' => [
-                        'expected' => $calculatedPath,
-                        'received' => $requestedPath
-                    ]
-                ], 404);
-            }
+        // Validation: Page exist?
+        if (!$page) {
+            return response()->json(['message' => 'Page not found'], 404);
+        }
 
-            // Visibility Validation:
-            // For now, we're blocking 'private' until we can log in, but child is published it should be visible
-            if (!$this->allParentsPublished($page)) {
-                return response()->json(['message' => 'One of the parent pages is not published'], 404);
-            }
+        // If user wants to access the homepage by slug
+        $homepageId = Setting::get('homepage_id');
+        if ((string)$page->id === (string)$homepageId) {
+            return response()->json(['message' => 'This is the homepage, use / root path'], 404);
+        }
+
+        // Hierarchy Validation:
+        // Check if the calculated full_url matches what the user entered. 
+        // This prevents someone from entering /zespol instead of /about-us/zespol.
+        $calculatedPath = trim($page->full_url, '/');
+        $requestedPath = trim($slug, '/');
+
+        if ($calculatedPath !== $requestedPath) {
+            return response()->json([
+                'message' => 'Page not found at this path',
+                'debug' => [
+                    'expected' => $calculatedPath,
+                    'received' => $requestedPath
+                ]
+            ], 404);
+        }
+
+        // Visibility Validation:
+        // For now, we're blocking 'private' until we can log in, but child is published it should be visible
+        if (!$this->allParentsPublished($page)) {
+            return response()->json(['message' => 'One of the parent pages is not published'], 404);
         }
 
         // Return clean data for the Frontend
@@ -72,6 +78,22 @@ class PageController extends Controller
             'content' => $page->content,
             'seo' => $page->seo,
             'full_url' => $page->full_url,
+            'published_at' => $page->published_at,
+            'is_password_protected' => $page->visibility === 'password',
+        ]);
+    }
+
+    /**
+     * Formats a unified JSON response for the frontend.
+     */
+    private function renderPageResponse(Page $page, bool $isHomepage = false): JsonResponse
+    {
+        return response()->json([
+            'id' => $page->id,
+            'title' => $page->title,
+            'content' => $page->content,
+            'seo' => $page->seo,
+            'full_url' => $isHomepage ? '/' : $page->full_url,
             'published_at' => $page->published_at,
             'is_password_protected' => $page->visibility === 'password',
         ]);

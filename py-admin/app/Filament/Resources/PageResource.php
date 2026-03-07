@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\PageResource\Pages;
 use App\Filament\Resources\PageResource\RelationManagers;
 use App\Models\Page;
+use App\Models\Setting;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -26,6 +27,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Split;
 use Filament\Forms\Components\Actions;
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Placeholder;
 
 class PageResource extends Resource
 {
@@ -64,6 +66,10 @@ class PageResource extends Resource
                         
                         TextInput::make('slug')
                             ->label(__('admin.pages.fields.slug'))
+                            ->hidden(function (Forms\Get $get, $record) {
+                                if (!$record) return false;
+                                return (string)$record->id === (string)Setting::get('homepage_id');
+                            })
                             ->required()
                             ->unique(ignoreRecord: true)
                             ->prefix(function (Forms\Get $get) {
@@ -81,6 +87,14 @@ class PageResource extends Resource
                             // Prevent the user from entering slashes,
                             // because the prefix already adds them automatically
                             ->afterStateUpdated(fn ($set, $state) => $set('slug', Str::slug($state))),
+
+                        Placeholder::make('slug_placeholder')
+                            ->label(__('admin.pages.fields.slug'))
+                            ->content('/')
+                            ->visible(function (Forms\Get $get, $record) {
+                                if (!$record) return false;
+                                return (string)$record->id === (string)Setting::get('homepage_id');
+                            }),
                         
                         // Builder blocks here
                     ]),

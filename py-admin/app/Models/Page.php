@@ -47,6 +47,18 @@ class Page extends Model
         return $this->hasMany(Page::class, 'parent_id');
     }
 
+    protected static function booted() {
+        static::saving(function ($page) {
+            $homepageId = Setting::get('homepage_id');
+
+            // If this page has just become/is the home page
+            if ((string)$page->id === (string)$homepageId) {
+                $page->slug = null;
+                $page->parent_id = null;
+            }
+        });
+    }
+
     /**
      * Calculates the full URL path of a page based on its parent hierarchy.
      * Example: /about-us/team/jan-smith
