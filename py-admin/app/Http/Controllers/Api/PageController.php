@@ -18,7 +18,7 @@ class PageController extends Controller
         $page = $this->resolvePage($slug, $homepageId);
 
         // Basic Validations (Quick Exits)
-        if (!$page) {
+        if (!$page || !$page->isLive()) {
             return response()->json(['message' => 'Page not found'], 404);
         }
 

@@ -55,7 +55,6 @@ export default async function Page(props: { params: Promise<{ slug?: string[] }>
   // In Next.js 15/16, 'params' is a Promise and must be explicitly awaited.
   const { slug } = await props.params;
   const data = await getPageData(slug);
-  console.log(data);
 
   // Trigger the built-in Next.js 404 page if the slug doesn't exist in the database.
   if (!data) notFound();

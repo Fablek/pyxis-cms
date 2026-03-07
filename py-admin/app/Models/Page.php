@@ -54,7 +54,7 @@ class Page extends Model
             $homepageId = Setting::get('homepage_id');
 
             // If this page has just become/is the home page
-            if ((string)$page->id === (string)$homepageId) {
+            if ($homepageId && (string)$page->id === (string)$homepageId) {
                 $page->slug = null;
                 $page->parent_id = null;
             }
@@ -90,7 +90,8 @@ class Page extends Model
      */
     public function isLive(): bool
     {
-        return $this->status === 'published' && 
+        return $this->status === 'published' &&
+            $this->visibility !== 'private' &&
             ($this->published_at === null || $this->published_at <= now());
     }
 }

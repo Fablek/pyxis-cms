@@ -15,12 +15,15 @@ class PageResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $isProtected = $this->visibility === 'password';
+        $shouldHideContent = $isProtected;
+
         $isHomepage = (string)$this->id === (string)Setting::get('homepage_id');
 
         return [
             'id' => $this->id,
             'title' => $this->title,
-            'content' => $this->content,
+            'content' => $shouldHideContent ? null : $this->content,
             'seo' => $this->seo,
             'full_url' => $isHomepage ? '/' : $this->full_url,
             'published_at' => $this->published_at,
