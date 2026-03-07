@@ -3,6 +3,7 @@
 namespace App\Filament\Pages;
 
 use App\Models\Setting;
+use App\Models\Page as PageModel;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Form;
@@ -30,7 +31,8 @@ class ManageSettings extends Page
     public function mount(): void
     {
         $this->form->fill([
-            'site_language' => Setting::where('key', 'site_language')->value('value') ?? 'pl',
+            'site_language' => Setting::get('site_language', 'pl'),
+            'homepage_id' => Setting::get('homepage_id'),
         ]);
     }
 
@@ -48,6 +50,11 @@ class ManageSettings extends Page
                             ])
                             ->native(false)
                             ->required(),
+
+                        Select::make('homepage_id')
+                            ->label(__('admin.settings.field_homepage'))
+                            ->options(PageModel::query()->pluck('title', 'id'))
+                            ->searchable()
                     ]),
             ])
             ->statePath('data');
@@ -66,10 +73,8 @@ class ManageSettings extends Page
     {
         $data = $this->form->getState();
 
-        Setting::updateOrCreate(
-            ['key' => 'site_language'],
-            ['value' => $data['site_language']]
-        );
+        Setting::set('site_language', $data['site_language']);
+        Setting::set('homepage_id', $data['homepage_id']);
 
         Notification::make()
             ->title(__('admin.settings.notification_success'))

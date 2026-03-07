@@ -67,6 +67,7 @@ return [
         'navigation_label' => 'Settings',
         'section_regionalization' => 'Regionalization',
         'field_language' => 'Panel Interface Language',
+        'field_homepage' => 'Homepage',
         'save_button' => 'Save changes',
         'notification_success' => 'Settings have been successfully updated',
     ],

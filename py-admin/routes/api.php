@@ -6,5 +6,5 @@ use Illuminate\Support\Facades\Route;
 
 // Catch-all route for parties.
 // '{slug}' with the '.*' condition will allow forward slashes to be passed in the address.
-Route::get('/pages/{slug}', [PageController::class, 'show'])
+Route::get('/pages/{slug?}', [PageController::class, 'show'])
     ->where('slug', '.*');

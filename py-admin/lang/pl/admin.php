@@ -67,6 +67,7 @@ return [
         'navigation_label' => 'Ustawienia',
         'section_regionalization' => 'Regionalizacja',
         'field_language' => 'Język interfejsu panelu',
+        'field_homepage' => 'Strona główna',
         'save_button' => 'Zapisz zmiany',
         'notification_success' => 'Ustawienia zostały pomyślnie zaktualizowane',
     ],
