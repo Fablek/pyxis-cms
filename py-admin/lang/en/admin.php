@@ -63,12 +63,23 @@ return [
         'editor' => 'Editor',
     ],
     'settings' => [
-        'title' => 'System Settings',
         'navigation_label' => 'Settings',
-        'section_regionalization' => 'Regionalization',
-        'field_language' => 'Panel Interface Language',
-        'field_homepage' => 'Homepage',
+        'title' => 'System Settings',
         'save_button' => 'Save changes',
-        'notification_success' => 'Settings have been successfully updated',
+        'notification_success' => 'Settings have been successfully saved.',
+        
+        'sections' => [
+            'config' => 'Main Configuration',
+            'config_desc' => 'Manage core site parameters, such as the default language and the homepage.',
+        ],
+        
+        'fields' => [
+            'language' => 'Site Language',
+            'homepage' => 'Main Homepage',
+        ],
+        
+        'placeholders' => [
+            'select_page' => 'Select a page from the list...',
+        ],
     ],
 ];

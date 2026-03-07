@@ -10,6 +10,7 @@ use Filament\Forms\Form;
 use Filament\Pages\Page;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
+use Filament\Forms\Components\Grid;
 
 class ManageSettings extends Page
 {
@@ -26,7 +27,7 @@ class ManageSettings extends Page
         return __('admin.settings.title');
     }
 
-    public ?array $data = [];
+    public array $data = [];
 
     public function mount(): void
     {
@@ -40,22 +41,30 @@ class ManageSettings extends Page
     {
         return $form
             ->schema([
-                Section::make(__('admin.settings.section_regionalization'))
+                Section::make(__('admin.settings.sections.config'))
+                    ->description(__('admin.settings.sections.config_desc'))
                     ->schema([
-                        Select::make('site_language')
-                            ->label(__('admin.settings.field_language'))
-                            ->options([
-                                'pl' => 'Polski (PL)',
-                                'en' => 'English (EN)',
-                            ])
-                            ->native(false)
-                            ->required(),
+                        Grid::make(2)
+                            ->schema([
+                                Select::make('site_language')
+                                    ->label(__('admin.settings.fields.language'))
+                                    ->options([
+                                        'pl' => 'Polski (PL)',
+                                        'en' => 'English (EN)',
+                                    ])
+                                    ->native(false)
+                                    ->required(),
 
-                        Select::make('homepage_id')
-                            ->label(__('admin.settings.field_homepage'))
-                            ->options(PageModel::query()->pluck('title', 'id'))
-                            ->searchable()
+                                Select::make('homepage_id')
+                                    ->label(__('admin.settings.fields.homepage'))
+                                    ->options(PageModel::query()->pluck('title', 'id'))
+                                    ->placeholder(__('admin.settings.placeholders.select_page'))
+                                    ->searchable()
+                                    ->preload()
+                                    ->native(false),
+                            ]),
                     ]),
+
             ])
             ->statePath('data');
     }
@@ -65,22 +74,21 @@ class ManageSettings extends Page
         return [
             Action::make('save')
                 ->label(__('admin.settings.save_button'))
+                ->color('primary')
                 ->submit('save'),
         ];
     }
 
     public function save(): void
     {
-        $data = $this->form->getState();
+        $state = $this->form->getState();
 
-        Setting::set('site_language', $data['site_language']);
-        Setting::set('homepage_id', $data['homepage_id']);
+        Setting::set('site_language', $state['site_language']);
+        Setting::set('homepage_id', $state['homepage_id']);
 
         Notification::make()
             ->title(__('admin.settings.notification_success'))
             ->success()
             ->send();
-
-        $this->redirect(route('filament.admin.pages.manage-settings'));
     }
 }

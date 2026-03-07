@@ -63,12 +63,23 @@ return [
         'editor' => 'Redaktor',
     ],
     'settings' => [
-        'title' => 'Ustawienia systemu',
         'navigation_label' => 'Ustawienia',
-        'section_regionalization' => 'Regionalizacja',
-        'field_language' => 'Język interfejsu panelu',
-        'field_homepage' => 'Strona główna',
+        'title' => 'Ustawienia systemu',
         'save_button' => 'Zapisz zmiany',
-        'notification_success' => 'Ustawienia zostały pomyślnie zaktualizowane',
+        'notification_success' => 'Ustawienia zostały pomyślnie zapisane.',
+        
+        'sections' => [
+            'config' => 'Konfiguracja główna',
+            'config_desc' => 'Zarządzaj podstawowymi parametrami witryny, takimi jak język domyślny oraz strona główna.',
+        ],
+        
+        'fields' => [
+            'language' => 'Język witryny',
+            'homepage' => 'Strona główna serwisu',
+        ],
+        
+        'placeholders' => [
+            'select_page' => 'Wybierz stronę z listy...',
+        ],
     ],
 ];
