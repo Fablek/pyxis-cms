@@ -54,19 +54,14 @@ class Page extends Model
     protected function fullUrl(): Attribute
     {
         return Attribute::make(
-            get: function(mixed $value, array $attributes) {
-                $currentSlug = $attributes['slug'] ?? '';
-                $slugs = collect([$currentSlug]);
-
-                $current = $this;
-
-                // Recursive tree traversal
-                while ($current->parent_id && $parent = $current->parent) {
-                    $slugs->prepend($parent->slug);
-                    $current = $parent;
+            get: function() {
+                // If page have parent, get his full url
+                if ($this->parent_id && $this->parent) {
+                    return rtrim($this->parent->full_url, '/') . '/' . $this->slug;
                 }
 
-                return '/' . $slugs->implode('/');
+                // If page is main return /
+                return '/' . $this->slug;
             },
         );
     }

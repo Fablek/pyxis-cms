@@ -70,8 +70,11 @@ class PageResource extends Resource
                                 $parentId = $get('parent_id');
                                 if ($parentId) {
                                     // Download the parent servant from the database
-                                    $parent = \App\Models\Page::find($parentId);
-                                    return $parent ? '/' . $parent->slug . '/' : '/';
+                                    $parent = Page::find($parentId);
+                                    
+                                    if ($parent) {
+                                        return rtrim($parent->full_url, '/') . '/';
+                                    }
                                 }
                                 return '/';
                             })
