@@ -81,3 +81,45 @@ it('returns 404 for draft pages', function () {
     $this->getJson('/api/pages/draft-page')
         ->assertStatus(404);
 });
+
+it('returns 404 for private pages', function () {
+    // Arrange: Page with private visibility
+    $privatePage = Page::factory()->create([
+        'slug' => 'private-page',
+        'visibility' => 'private',
+        'published_at' => now()->subDay(),
+    ]);
+
+    Setting::set('site_language', 'pl');
+
+    // Act & Assert
+    $this->getJson('/api/pages/private-page')
+        ->assertStatus(404);
+});
+
+it('returns 200 but hides content for password protected pages', function () {
+    // Arrange: Protected page
+    $passwordPage = Page::factory()->create([
+        'slug' => 'password-page',
+        'status' => 'published',
+        'visibility' => 'password',
+        'content' => ['blocks' => 'this should be hidden'],
+    ]);
+
+    Setting::set('site_language', 'pl');
+
+    // Act & Assert
+    $response = $this->getJson('/api/pages/password-page');
+
+    $response->assertStatus(200)
+        ->assertJsonPath('data.is_password_protected', true)
+        ->assertJsonPath('data.content', null);
+});
+
+it('returns 404 when homepage is requested but not set in settings', function () {
+    // Arrange: Homepage is not set in settings
+    Setting::set('site_language', 'pl');
+
+    $this->getJson('/api/pages')
+        ->assertStatus(404);
+});
