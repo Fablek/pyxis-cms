@@ -1,4 +1,3 @@
-// app/api/preview/route.ts
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 

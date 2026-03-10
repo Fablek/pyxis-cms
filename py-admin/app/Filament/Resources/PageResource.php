@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use Illuminate\Support\Facades\Http;
 use App\Filament\Resources\PageResource\Pages;
 use App\Filament\Resources\PageResource\RelationManagers;
 use App\Models\Page;
@@ -159,7 +160,7 @@ class PageResource extends Resource
                                         ->openUrlInNewTab(),
 
                                     Action::make('publish')
-                                        ->label(__('admin.pages.actions.publish') ?? 'Publikuj')
+                                        ->label(__('admin.pages.actions.publish'))
                                         ->color('success')
                                         ->icon('heroicon-o-rocket-launch')
                                         ->requiresConfirmation()
@@ -173,6 +174,21 @@ class PageResource extends Resource
                                             $record->update([
                                                 'content' => $record->content_draft,
                                             ]);
+
+                                            // Send signal to frontend
+                                            try {
+                                                $frontendUrl = config('app.frontend_url', 'http://localhost:3000');
+                                                $revalidateToken = config('app.revalidate_token', 'super-secret-token');
+
+                                                // Send request to refresh a specific track
+                                                Http::post("{$frontendUrl}/api/revalidate", [
+                                                    'secret' => $revalidateToken,
+                                                    'path' => $record->full_url === '/' ? '/' : $record->full_url,
+                                                ]);
+                                            } catch (\Exception $e) {
+                                                // Log error but not stop publishing
+                                                \Log::error("Revalidation error: " . $e->getMessage());
+                                            }
 
                                             Notification::make()
                                                 ->title(__('admin.pages.notifications.published'))

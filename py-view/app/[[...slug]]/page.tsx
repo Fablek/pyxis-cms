@@ -42,9 +42,7 @@ async function getPageData(slugArray: string[] | undefined): Promise<PageData | 
 
   try {
     const res = await fetch(`${API_URL}/pages/${slug}`, { 
-      // Force Server-Side Rendering (SSR) to ensure content editors see 
-      // their changes immediately after saving in Filament.
-      cache: 'no-store', 
+      cache: previewToken ? 'no-store' : 'force-cache',
       headers: headers,
       // Abort the request if the backend takes longer than 5 seconds to respond.
       signal: AbortSignal.timeout(5000) 
@@ -80,7 +78,7 @@ export default async function Page(props: { params: Promise<{ slug?: string[] }>
         <div className="fixed top-0 left-0 w-full bg-black text-white py-2 px-4 flex justify-between items-center z-50 text-sm font-bold shadow-xl">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
-            TRYB PODGLĄDU AKTYWNY (SZKIC)
+            TRYB PODGLĄDU AKTYWNY
           </div>
           <a 
             href="/api/exit-preview" 
