@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import { cookies } from 'next/headers';
+import Link from 'next/link';
 
 /**
  * 1. TYPE DEFINITIONS
@@ -80,12 +81,12 @@ export default async function Page(props: { params: Promise<{ slug?: string[] }>
             <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
             TRYB PODGLĄDU AKTYWNY
           </div>
-          <a 
+          <Link 
             href="/api/exit-preview" 
             className="bg-white text-black px-3 py-1 rounded hover:bg-slate-200 transition"
           >
             Wyłącz podgląd
-          </a>
+          </Link>
         </div>
       )}
 
