@@ -4,8 +4,9 @@ return [
         'label' => 'Page',
         'plural_label' => 'Pages',
         'sections' => [
-            'publish' => 'Publish',
+            'publish' => 'Publishing & Visibility',
             'attributes' => 'Page Attributes',
+            'content' => 'Page Content',
         ],
         'fields' => [
             'title' => 'Title',
@@ -16,6 +17,7 @@ return [
             'published_at' => 'Published at',
             'parent' => 'Parent Page',
             'author' => 'Author',
+            'content_draft' => 'Page Content',
         ],
         'status' => [
             'draft' => 'Draft',
@@ -24,15 +26,21 @@ return [
         ],
         'visibility' => [
             'public' => 'Public',
-            'private' => 'Private',
+            'private' => 'Private (Hidden)',
             'password' => 'Password Protected',
         ],
         'actions' => [
-            'save' => 'Save Changes',
-            'delete' => 'Delete',
+            'save' => 'Save Draft',
+            'publish' => 'Publish Changes',
+            'preview' => 'Live Preview',
+            'delete' => 'Delete Page',
         ],
         'modals' => [
             'delete_confirm' => 'Are you sure you want to delete this page?',
+            'publish_confirm' => 'This will overwrite the public version with your current draft. Continue?',
+        ],
+        'notifications' => [
+            'published' => 'The page has been successfully published!',
         ],
         'placeholders' => [
             'none_root' => 'None (Root page)',

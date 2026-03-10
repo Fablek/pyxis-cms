@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation';
+import { cookies } from 'next/headers';
 
 /**
  * 1. TYPE DEFINITIONS
@@ -10,6 +11,7 @@ interface PageData {
   content: any;
   full_url: string;
   is_password_protected: boolean;
+  is_preview: boolean;
   published_at: string;
   seo: any;
 }
@@ -21,16 +23,29 @@ interface PageData {
 async function getPageData(slugArray: string[] | undefined): Promise<PageData | null> {
   // Convert ['parent', 'child'] array into a 'parent/child' string. 
   const slug = slugArray?.length ? slugArray.join('/') : '';
+
+  const cookieStore = await cookies();
+  const previewToken = cookieStore.get('pyxis_preview')?.value;
   
   // Use the Docker service name 'admin' for internal container communication.
   const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://admin:8000/api';
+
+  // Setup headers
+  const headers: HeadersInit = { 
+    'Accept': 'application/json' 
+  };
+
+  // If have token
+  if (previewToken) {
+    headers['X-Pyxis-Preview'] = previewToken;
+  }
 
   try {
     const res = await fetch(`${API_URL}/pages/${slug}`, { 
       // Force Server-Side Rendering (SSR) to ensure content editors see 
       // their changes immediately after saving in Filament.
       cache: 'no-store', 
-      headers: { 'Accept': 'application/json' },
+      headers: headers,
       // Abort the request if the backend takes longer than 5 seconds to respond.
       signal: AbortSignal.timeout(5000) 
     });
@@ -52,37 +67,38 @@ async function getPageData(slugArray: string[] | undefined): Promise<PageData | 
  * The entry point for all dynamic routes managed by the CMS.
  */
 export default async function Page(props: { params: Promise<{ slug?: string[] }> }) {
-  // In Next.js 15/16, 'params' is a Promise and must be explicitly awaited.
   const { slug } = await props.params;
   const data = await getPageData(slug);
 
-  // Trigger the built-in Next.js 404 page if the slug doesn't exist in the database.
   if (!data) notFound();
 
   return (
     <main className="max-w-4xl mx-auto p-10 font-sans">
-      <header className="mb-8 border-b pb-8">
+      
+      {/* PASEK PODGLĄDU - Wyświetli się tylko w trybie preview */}
+      {data.is_preview && (
+        <div className="fixed top-0 left-0 w-full bg-black text-white py-2 px-4 flex justify-between items-center z-50 text-sm font-bold shadow-xl">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+            TRYB PODGLĄDU AKTYWNY (SZKIC)
+          </div>
+          <a 
+            href="/api/exit-preview" 
+            className="bg-white text-black px-3 py-1 rounded hover:bg-slate-200 transition"
+          >
+            Wyłącz podgląd
+          </a>
+        </div>
+      )}
+
+      <header className={`mb-8 border-b pb-8 ${data.is_preview ? 'mt-12' : ''}`}>
         <h1 className="text-5xl font-extrabold text-slate-900 tracking-tight">
           {data.title}
         </h1>
-        <p className="mt-2 text-slate-500 font-mono text-sm uppercase tracking-wider">
-          📍 API Path: {data.full_url}
-        </p>
+        {/* ... reszta nagłówka ... */}
       </header>
 
-      <section className="prose prose-slate lg:prose-xl">
-        {data.is_password_protected ? (
-          <div className="bg-amber-50 border border-amber-200 p-6 rounded-lg text-amber-800 flex items-center shadow-sm">
-            <span className="text-2xl mr-4">🔒</span>
-            <p>This page is password protected. Access form coming soon.</p>
-          </div>
-        ) : (
-          <div className="text-slate-700 leading-relaxed min-h-[200px] flex items-center justify-center border-2 border-dashed border-slate-200 rounded-xl">
-             {/* Content placeholder - logic for Block Builder will go here */}
-             <p className="italic text-slate-400">Content rendering engine pending...</p>
-          </div>
-        )}
-      </section>
+      {/* ... reszta renderowania strony ... */}
     </main>
   );
 }

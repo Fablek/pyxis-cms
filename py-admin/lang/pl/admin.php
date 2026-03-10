@@ -1,11 +1,12 @@
 <?php
 return [
     'pages' => [
-        'label' => 'Stronę',
+        'label' => 'Strona',
         'plural_label' => 'Strony',
         'sections' => [
-            'publish' => 'Opublikuj',
+            'publish' => 'Publikacja i widoczność',
             'attributes' => 'Atrybuty strony',
+            'content' => 'Treść strony',
         ],
         'fields' => [
             'title' => 'Tytuł',
@@ -16,6 +17,7 @@ return [
             'published_at' => 'Data publikacji',
             'parent' => 'Strona nadrzędna',
             'author' => 'Autor',
+            'content_draft' => 'Treść strony',
         ],
         'status' => [
             'draft' => 'Szkic',
@@ -23,19 +25,69 @@ return [
             'scheduled' => 'Zaplanowano',
         ],
         'visibility' => [
-            'public' => 'Publiczne',
-            'private' => 'Prywatne',
-            'password' => 'Chronione hasłem',
+            'public' => 'Publiczna',
+            'private' => 'Prywatna (Ukryta)',
+            'password' => 'Chroniona hasłem',
         ],
         'actions' => [
-            'save' => 'Zapisz zmiany',
-            'delete' => 'Usuń',
+            'save' => 'Zapisz szkic',
+            'publish' => 'Publikuj zmiany',
+            'preview' => 'Podgląd na żywo',
+            'delete' => 'Usuń stronę',
         ],
         'modals' => [
             'delete_confirm' => 'Czy na pewno chcesz usunąć tę stronę?',
+            'publish_confirm' => 'Ta akcja nadpisze publiczną wersję strony aktualnym szkicem. Kontynuować?',
+        ],
+        'notifications' => [
+            'published' => 'Strona została pomyślnie opublikowana!',
         ],
         'placeholders' => [
-            'none_root' => 'Brak (strona główna)',
+            'none_root' => 'Brak (Strona główna)',
+        ],
+    ],
+    'nav' => [
+        'users' => 'Użytkownicy',
+        'settings' => 'Ustawienia',
+        'pages' => 'Strony',
+    ],
+    'users' => [
+        'label' => 'Użytkownik',
+        'plural_label' => 'Użytkownicy',
+        'sections' => [
+            'basic_data' => 'Dane podstawowe',
+            'security' => 'Bezpieczeństwo',
+        ],
+        'fields' => [
+            'name' => 'Imię i nazwisko',
+            'email' => 'Adres e-mail',
+            'role' => 'Rola w systemie',
+            'password' => 'Hasło',
+            'created_at' => 'Utworzono',
+        ],
+    ],
+    'roles' => [
+        'admin' => 'Administrator',
+        'editor' => 'Redaktor',
+    ],
+    'settings' => [
+        'navigation_label' => 'Ustawienia',
+        'title' => 'Ustawienia systemu',
+        'save_button' => 'Zapisz zmiany',
+        'notification_success' => 'Ustawienia zostały pomyślnie zapisane.',
+        
+        'sections' => [
+            'config' => 'Główna konfiguracja',
+            'config_desc' => 'Zarządzaj podstawowymi parametrami strony, takimi jak język domyślny i strona główna.',
+        ],
+        
+        'fields' => [
+            'language' => 'Język strony',
+            'homepage' => 'Strona główna',
+        ],
+        
+        'placeholders' => [
+            'select_page' => 'Wybierz stronę z listy...',
         ],
     ],
     'nav' => [

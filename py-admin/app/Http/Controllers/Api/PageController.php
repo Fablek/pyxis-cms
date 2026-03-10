@@ -7,18 +7,27 @@ use App\Models\Page;
 use App\Models\Setting;
 use App\Http\Resources\PageResource;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class PageController extends Controller
 {
-    public function show(?string $slug = null)
+    public function show(?string $slug = null, Request $request)
     {
         $homepageId = Setting::get('homepage_id');
+
+        // Check preview
+        $isPreview = false;
+        if ($token = $request->header('X-Pyxis-Preview')) {
+            try {
+                $isPreview = decrypt($token) === 'pyxis-preview-mode';
+            } catch (\Exception $e) {}
+        }
 
         // Choosing the right site
         $page = $this->resolvePage($slug, $homepageId);
 
         // Basic Validations (Quick Exits)
-        if (!$page || !$page->isLive()) {
+        if (!$page || (!$page->isLive() && !$isPreview)) {
             return response()->json(['message' => 'Page not found'], 404);
         }
 
@@ -33,7 +42,7 @@ class PageController extends Controller
         }
 
         // Parent validation
-        if (!$this->allParentsPublished($page)) {
+        if (!$isPreview && !$this->allParentsPublished($page)) {
             return response()->json(['message' => 'One of the parent pages is not published'], 404);
         }
 

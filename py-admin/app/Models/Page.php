@@ -19,6 +19,7 @@ class Page extends Model
         'title',
         'slug',
         'content',
+        'content_draft',
         'seo',
         'status',
         'visibility',
@@ -30,6 +31,7 @@ class Page extends Model
 
     protected $casts = [
         'content' => 'array',
+        'content_draft' => 'array',
         'seo' => 'array',
         'published_at' => 'datetime',
     ];
@@ -78,6 +80,37 @@ class Page extends Model
                 return '/' . $this->slug;
             },
         );
+    }
+
+    /**
+     * The main method serving content to the API.
+     * Decides whether to send the LIVE or DRAFT version.
+     */
+    public function getResolvedContent(bool $isPreview = false): ?array 
+    {
+        if ($isPreview) {
+            // In preview mode, the scratchpad takes priority.
+            // If the draft is empty, fallback to the original content.
+            return $this->content_draft ?? $this->content;
+        }
+
+        // For regular users, always only official content.
+        return $this->content;
+    }
+
+    /**
+     * Generates a secure preview link with an HMAC signature.
+     */
+    public function getPreviewUrl(): string
+    {
+        $expires = now()->addMinutes(30)->timestamp;
+        $path = ($this->full_url && $this->full_url !== '/') ? ltrim($this->full_url, '/') : 'homepage';
+
+        $signature = hash_hmac('sha256', "{$path}|{$expires}", config('app.key'));
+
+        $frontendUrl = config('app.frontend_url', 'http://localhost:3000');
+
+        return "{$frontendUrl}/api/preview?path={$path}&expires={$expires}&signature={$signature}";
     }
 
     /**

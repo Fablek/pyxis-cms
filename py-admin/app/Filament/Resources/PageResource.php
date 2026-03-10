@@ -28,6 +28,9 @@ use Filament\Forms\Components\Split;
 use Filament\Forms\Components\Actions;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\Builder as CompBuilder;
+use Filament\Forms\Components\Actions\Action;
+use Filament\Notifications\Notification;
 
 class PageResource extends Resource
 {
@@ -95,6 +98,13 @@ class PageResource extends Resource
                                 if (!$record) return false;
                                 return (string)$record->id === (string)Setting::get('homepage_id');
                             }),
+
+                        CompBuilder::make('content_draft')
+                            ->label(__('admin.pages.fields.content_draft'))
+                            ->blocks([
+                                // Blocks here (acf)
+                            ])
+                            ->columnSpanFull(),
                         
                         // Builder blocks here
                     ]),
@@ -140,20 +150,50 @@ class PageResource extends Resource
                                     ->visible(fn ($get) => $get('visibility') === 'password'),
 
                                 Actions::make([
+                                    // Button preview
+                                    Action::make('preview')
+                                        ->label(__('admin.pages.actions.preview'))
+                                        ->color('gray')
+                                        ->icon('heroicon-o-eye')
+                                        ->url(fn ($record) => $record->getPreviewUrl())
+                                        ->openUrlInNewTab(),
+
+                                    Action::make('publish')
+                                        ->label(__('admin.pages.actions.publish') ?? 'Publikuj')
+                                        ->color('success')
+                                        ->icon('heroicon-o-rocket-launch')
+                                        ->requiresConfirmation()
+                                        ->modalHeading(__('admin.pages.modals.publish_confirm'))
+                                        ->hidden(fn ($operation, $record) => $operation === 'create' || $record === null)
+                                        ->action(function ($record, $livewire) {
+                                            // First save changes
+                                            $livewire->save();
+
+                                            // 2. Then publish
+                                            $record->update([
+                                                'content' => $record->content_draft,
+                                            ]);
+
+                                            Notification::make()
+                                                ->title(__('admin.pages.notifications.published'))
+                                                ->success()
+                                                ->send();
+                                        }),
+        
                                     // Button save
-                                    Forms\Components\Actions\Action::make('save')
+                                    Action::make('save')
                                         ->label(__('admin.pages.actions.save'))
                                         ->color('primary')
                                         ->submit('save'),
 
                                     // Button delete
-                                    Forms\Components\Actions\Action::make('delete')
+                                    Action::make('delete')
                                         ->label(__('admin.pages.actions.delete'))
                                         ->color('danger')
                                         ->icon('heroicon-o-trash')
                                         ->requiresConfirmation() // This will trigger a modal asking for confirmation
                                         ->modalHeading(__('admin.pages.modals.delete_confirm'))
-                                        ->hidden(fn ($operation) => $operation === 'create') // We hide while creating
+                                        ->hidden(fn ($operation) => $operation === 'create') // Hide while creating
                                         ->action(function ($record, $livewire) {
                                             $record->delete();
                                             // After deletion, we return to the list of pages
