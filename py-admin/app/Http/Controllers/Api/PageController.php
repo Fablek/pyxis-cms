@@ -11,7 +11,7 @@ use Illuminate\Http\Request;
 
 class PageController extends Controller
 {
-    public function show(?string $slug = null, Request $request)
+    public function show(Request $request, ?string $slug = null)
     {
         $homepageId = Setting::get('homepage_id');
 
