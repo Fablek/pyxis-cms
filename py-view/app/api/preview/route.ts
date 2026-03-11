@@ -15,9 +15,11 @@ export async function GET(request: Request) {
   const cookieStore = await cookies();
   cookieStore.set('pyxis_preview', data.preview_token, {
     httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
     path: '/',
   });
 
-  // Przekierowanie na pełną ścieżkę
+  // Redirect to the actual page being previewed
   redirect(path === 'homepage' ? '/' : `/${path}`);
 }
