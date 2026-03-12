@@ -157,7 +157,11 @@ class PageResource extends Resource
                                         ->color('gray')
                                         ->icon('heroicon-o-eye')
                                         ->url(fn ($record) => $record->getPreviewUrl())
-                                        ->openUrlInNewTab(),
+                                        ->openUrlInNewTab()
+                                        ->extraAttributes([
+                                            'wire:click.prevent' => false, 
+                                            'rel' => 'noopener noreferrer',
+                                        ]),
 
                                     Action::make('publish')
                                         ->label(__('admin.pages.actions.publish'))

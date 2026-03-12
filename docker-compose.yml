@@ -1,46 +1,52 @@
 services:
-  # Backend: Laravel (py-admin)
+  # Backend: Laravel
   admin:
     build:
-      context: ./py-admin
+      context: .
       dockerfile: Dockerfile
+    container_name: pyxis-admin
     volumes:
-      - ./py-admin:/var/www/html
-      - ./py-content:/var/www/html/py-content
+      - .:/var/www/html
     environment:
       - APP_ENV=local
       - DB_CONNECTION=pgsql
       - DB_HOST=db
+      - DB_PORT=5432
+      - DB_DATABASE=pyxis_db
+      - DB_USERNAME=pyxis_user
+      - DB_PASSWORD=secret
     depends_on:
       - db
     ports:
       - "8000:8000"
+    networks:
+      - pyxis-network
 
-  # Frontend: Next.js (py-view)
-  view:
-    build:
-      context: ./py-view
-    volumes:
-      - ./py-view:/app
-      - ./py-content:/app/py-content
-    ports:
-      - "3000:3000"
-
-  # Baza danych: PostgreSQL
+  # Database: PostgreSQL
   db:
     image: postgres:16-alpine
+    container_name: pyxis-db
     environment:
       - POSTGRES_DB=pyxis_db
       - POSTGRES_USER=pyxis_user
       - POSTGRES_PASSWORD=secret
     volumes:
       - db_data:/var/lib/postgresql/data
+    networks:
+      - pyxis-network
 
   db-panel:
     image: adminer
+    container_name: pyxis-adminer
     restart: always
     ports:
       - 8080:8080
+    networks:
+      - pyxis-network
 
 volumes:
   db_data:
+
+networks:
+  pyxis-network:
+    external: true

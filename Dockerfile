@@ -23,5 +23,8 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
 
+# Copy project files (from main directory)
+COPY . .
+
 # Launching the built-in Laravel server on port 8000
 CMD composer install && php artisan serve --host=0.0.0.0 --port=8000
