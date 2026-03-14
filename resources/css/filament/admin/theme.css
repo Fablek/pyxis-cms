@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import '../../../../vendor/filament/filament/resources/css/index.css';
+
+@config "tailwind.config.js";
+
+/* Hide buttons */
+.fi-sidebar-header button {
+    display: none !important;
+}
+
+.fi-topbar-open-sidebar-btn, 
+.fi-topbar-close-sidebar-btn {
+    display: none !important;
+}
