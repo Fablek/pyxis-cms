@@ -27,6 +27,8 @@ class AdminPanelProvider extends PanelProvider
         return $panel
             ->default()
             ->id('admin')
+            ->brandLogo(fn () => view('filament.admin.logo'))
+            ->brandName('Pyxis CMS')
             ->path('')
             ->login()
             ->colors([

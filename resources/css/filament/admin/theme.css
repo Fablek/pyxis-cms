@@ -6,7 +6,6 @@
 
 @config "tailwind.config.js";
 
-/* Hide buttons */
 .fi-sidebar-header button {
     display: none !important;
 }
@@ -14,4 +13,95 @@
 .fi-topbar-open-sidebar-btn, 
 .fi-topbar-close-sidebar-btn {
     display: none !important;
+}
+
+.fi-sidebar, 
+.fi-sidebar-header, 
+.fi-sidebar-nav {
+    background-color: #18181b !important;
+}
+
+.fi-sidebar-header {
+    box-shadow: none !important;
+    ring-width: 0 !important;
+    border-bottom: none !important;
+}
+
+.fi-sidebar {
+    ring-width: 0 !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+.fi-sidebar-header {
+    display: flex !important;
+    justify-content: flex-start !important;
+    padding-left: 1.25rem !important;
+}
+
+.fi-sidebar-collapsed .fi-sidebar-header {
+    justify-content: center !important;
+    padding-left: 0 !important;
+}
+
+.fi-logo img {
+    max-width: none !important;
+}
+
+.fi-sidebar-header > div[x-show="$store.sidebar.isOpen"] {
+    display: flex !important;
+    opacity: 1 !important;
+}
+
+.fi-sidebar-collapsed .fi-sidebar-header > div {
+    justify-content: center !important;
+    width: 100%;
+}
+
+.fi-sidebar-collapsed .fi-sidebar-header a {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.fi-sidebar {
+    --tw-ring-screen: 0 0 0 0;
+    ring-width: 0;
+    --tw-ring-width: 0px;
+    border-right: none !important;
+}
+
+body {
+    background-color: #18181b !important;
+}
+
+.fi-main-ctn {
+    min-height: 100vh !important;
+    background-color: transparent !important;
+}
+
+.fi-main {
+    margin-top: 8px;
+    margin-bottom: 8px;
+    margin-right: 8px;
+    border-radius: 12px;
+    min-height: calc(100vh - 16px);
+    box-shadow: none;
+    max-width: calc(100% - 8px);
+    padding: 0 !important;
+}
+
+.fi-page {
+    padding: 20px;
+}
+
+.fi-page > section {
+    padding: 0 !important;
+}
+
+.dark .fi-main {
+    background-color: #09090b !important;
+}
+
+.fi-dropdown-trigger {
+    justify-content: center;
 }
