@@ -2,98 +2,143 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Import default Filament styles */
 @import '../../../../vendor/filament/filament/resources/css/index.css';
 
 @config "tailwind.config.js";
 
-.fi-sidebar-header button {
-    display: none !important;
-}
+/* --- 1. UI CLEANUP --- */
 
+/* Hide default Filament sidebar toggle buttons to use our custom trigger */
+.fi-sidebar-header button,
 .fi-topbar-open-sidebar-btn, 
 .fi-topbar-close-sidebar-btn {
     display: none !important;
 }
 
-.fi-sidebar, 
-.fi-sidebar-header, 
-.fi-sidebar-nav {
-    background-color: #18181b !important;
-}
-
+/* Align logo and clean up sidebar header spacing */
 .fi-sidebar-header {
     box-shadow: none !important;
     ring-width: 0 !important;
     border-bottom: none !important;
-}
-
-.fi-sidebar {
-    ring-width: 0 !important;
-    border-right: 1px solid rgba(255, 255, 255, 0.05) !important;
-}
-
-.fi-sidebar-header {
     display: flex !important;
     justify-content: flex-start !important;
     padding-left: 1.25rem !important;
 }
 
+/* Center logo when sidebar is in collapsed (mini) state */
 .fi-sidebar-collapsed .fi-sidebar-header {
     justify-content: center !important;
     padding-left: 0 !important;
 }
 
+/* Prevent logo from being constrained */
 .fi-logo img {
     max-width: none !important;
 }
 
+/* Ensure custom logo visibility during Alpine.js transitions */
 .fi-sidebar-header > div[x-show="$store.sidebar.isOpen"] {
     display: flex !important;
     opacity: 1 !important;
 }
 
-.fi-sidebar-collapsed .fi-sidebar-header > div {
-    justify-content: center !important;
-    width: 100%;
-}
-
+/* Center logo container in collapsed mode */
+.fi-sidebar-collapsed .fi-sidebar-header > div,
 .fi-sidebar-collapsed .fi-sidebar-header a {
     display: flex;
     justify-content: center;
     width: 100%;
 }
 
-.fi-sidebar {
-    --tw-ring-screen: 0 0 0 0;
-    ring-width: 0;
-    --tw-ring-width: 0px;
-    border-right: none !important;
+/* --- 2. GLOBAL BACKGROUNDS --- */
+
+/* App background - Zinc 100 for Light, Zinc 900 for Dark */
+body {
+    background-color: #f4f4f5 !important;
 }
 
-body {
+.dark body {
     background-color: #18181b !important;
 }
 
+/* Set container to transparent so the body color is visible behind the floating card */
 .fi-main-ctn {
     min-height: 100vh !important;
     background-color: transparent !important;
 }
 
-.fi-main {
-    margin-top: 8px;
-    margin-bottom: 8px;
-    margin-right: 8px;
-    border-radius: 12px;
-    min-height: calc(100vh - 16px);
-    box-shadow: none;
-    max-width: calc(100% - 8px);
-    padding: 0 !important;
+/* --- 3. SIDEBAR STYLING --- */
+
+/* Sidebar Background 
+   Light Mode: Matches body (#f4f4f5) for a seamless borderless look
+   Dark Mode: Matches body (#18181b)
+*/
+.fi-sidebar, 
+.fi-sidebar-header, 
+.fi-sidebar-nav {
+    background-color: #f4f4f5 !important;
 }
 
-.fi-page > section {
-    padding: 24px;
+.dark .fi-sidebar, 
+.dark .fi-sidebar-header, 
+.dark .fi-sidebar-nav {
+    background-color: #18181b !important;
+}
+
+/* EXTREME BORDER & RING RESET 
+   This removes the annoying 1px line/shadow on the right side of the sidebar 
+   by killing Tailwind's ring variables and standard borders.
+*/
+.fi-sidebar {
+    border-right: none !important;
+    border-inline-end-width: 0px !important;
+    box-shadow: none !important;
+    ring-width: 0 !important;
+    --tw-ring-width: 0px !important;
+    --tw-ring-offset-width: 0px !important;
+    --tw-ring-color: transparent !important;
+    --tw-ring-shadow: none !important;
+}
+
+.dark .fi-sidebar {
+    border-right: none !important;
+    --tw-ring-color: transparent !important;
+}
+
+/* Ensure the line is removed even when the sidebar is 'sticky' on desktop */
+@media (min-width: 1024px) {
+    .fi-sidebar.lg\:sticky {
+        border-right: none !important;
+        --tw-ring-width: 0px !important;
+        box-shadow: none !important;
+    }
+}
+
+/* --- 4. MAIN FLOATING CARD (.fi-main) --- */
+
+/* Floating Content Card 
+   Margins create the 'detached' effect.
+   Max-width calc accounts for the 8px right margin.
+*/
+.fi-main {
+    margin: 8px 8px 8px 0; 
+    border-radius: 12px;
+    min-height: calc(100vh - 16px);
+    max-width: calc(100% - 8px);
+    padding: 0 !important; /* Header inside this card will handle its own padding */
+    background-color: #ffffff !important; /* Card is white to pop against #f4f4f5 background */
+    border: 1px solid rgba(0, 0, 0, 0.05) !important;
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1) !important;
 }
 
 .dark .fi-main {
-    background-color: #09090b !important;
+    background-color: #09090b !important; /* Deep black for dark mode card */
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    box-shadow: none !important;
+}
+
+/* Inner padding for the actual page content */
+.fi-page > section {
+    padding: 24px;
 }

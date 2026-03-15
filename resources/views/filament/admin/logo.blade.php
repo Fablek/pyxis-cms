@@ -14,10 +14,11 @@
         x-transition:enter-end="opacity-100 translate-x-0"
         class="flex flex-col overflow-hidden whitespace-nowrap"
     >
-        <span class="text-sm font-bold leading-none text-white tracking-tight">
+        <span class="text-sm font-bold leading-none text-gray-950 dark:text-white tracking-tight">
             Pyxis CMS
         </span>
-        <span class="text-[10px] text-gray-400 font-medium leading-none mt-1">
+        
+        <span class="text-[10px] text-gray-500 dark:text-gray-400 font-medium leading-none mt-1">
             v1.0.0
         </span>
     </div>
