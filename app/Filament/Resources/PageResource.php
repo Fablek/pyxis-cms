@@ -157,6 +157,7 @@ class PageResource extends Resource
                                         ->color('gray')
                                         ->icon('heroicon-o-eye')
                                         ->url(fn ($record) => $record->getPreviewUrl())
+                                        ->visible(fn ($record) => $record !== null)
                                         ->openUrlInNewTab()
                                         ->extraAttributes([
                                             'wire:click.prevent' => false, 

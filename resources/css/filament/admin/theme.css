@@ -90,12 +90,8 @@ body {
     padding: 0 !important;
 }
 
-.fi-page {
-    padding: 20px;
-}
-
 .fi-page > section {
-    padding: 0 !important;
+    padding: 24px;
 }
 
 .dark .fi-main {

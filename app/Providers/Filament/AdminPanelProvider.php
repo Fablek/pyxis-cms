@@ -72,10 +72,8 @@ class AdminPanelProvider extends PanelProvider
         parent::register();
 
         FilamentView::registerRenderHook(
-            'panels::content.start',
-            fn (array $scopes): string => view('filament.custom-header', [
-                'livewire' => $scopes['this'] ?? null,
-            ])->render(),
+            'panels::page.start',
+            fn (): string => view('filament.custom-header')->render(),
         );
 
         FilamentView::registerRenderHook(
