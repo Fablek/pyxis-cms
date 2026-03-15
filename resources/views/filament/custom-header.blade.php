@@ -21,7 +21,6 @@
     }
 @endphp
 
-{{-- Kluczowe zmiany: mb-6 (odstęp od dołu), w-full, oraz bg-white/dark --}}
 <header class="flex h-16 w-full shrink-0 items-center justify-between gap-4 border-b border-gray-200/50 dark:border-white/10 px-6 transition-all backdrop-blur-md rounded-t-xl">
     <div class="flex items-center gap-2 overflow-hidden">
         <button x-data="{}" x-on:click="$store.sidebar.isOpen ? $store.sidebar.close() : $store.sidebar.open()" class="inline-flex items-center justify-center rounded-md size-8 text-gray-500 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors">
