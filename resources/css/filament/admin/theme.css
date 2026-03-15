@@ -86,6 +86,24 @@ body {
     background-color: #18181b !important;
 }
 
+/* Styling for sidebar navigation items */
+.fi-sidebar-item-button {
+    /* Optional: reduce the gap between icon and text if 16px icon looks too far away */
+    gap: 8px;
+}
+
+/* Resize the icon to 16x16px */
+.fi-sidebar-item-icon {
+    width: 16px;
+    height: 16px;
+}
+
+/* Ensure text is exactly 14px */
+.fi-sidebar-item-label {
+    font-size: 14px;
+    line-height: 1.25rem; /* 20px */
+}
+
 /* EXTREME BORDER & RING RESET 
    This removes the annoying 1px line/shadow on the right side of the sidebar 
    by killing Tailwind's ring variables and standard borders.
