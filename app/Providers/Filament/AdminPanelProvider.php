@@ -79,7 +79,7 @@ class AdminPanelProvider extends PanelProvider
         FilamentView::registerRenderHook(
             'panels::sidebar.footer',
             fn (): string => Blade::render('
-                <div class="border-t border-gray-200 dark:border-white/10 p-4">
+                <div class="fi-sidebar-user border-t border-gray-200 dark:border-white/10 p-4">
                     <x-filament-panels::user-menu />
                 </div>
             '),

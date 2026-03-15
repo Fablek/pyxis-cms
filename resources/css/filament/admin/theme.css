@@ -7,6 +7,11 @@
 
 @config "tailwind.config.js";
 
+:root {
+    --sidebar-width: 250px !important; 
+    --sidebar-collapsed-width: 64px;
+}
+
 /* --- 1. UI CLEANUP --- */
 
 /* Hide default Filament sidebar toggle buttons to use our custom trigger */
@@ -23,7 +28,7 @@
     border-bottom: none !important;
     display: flex !important;
     justify-content: flex-start !important;
-    padding-left: 1.25rem !important;
+    padding: 0;
 }
 
 /* Center logo when sidebar is in collapsed (mini) state */
@@ -74,6 +79,19 @@ body {
    Light Mode: Matches body (#f4f4f5) for a seamless borderless look
    Dark Mode: Matches body (#18181b)
 */
+.fi-sidebar, .fi-sidebar-header, .fi-sidebar-nav {
+    padding: 8px;
+}
+
+.fi-sidebar-user {
+    padding: 0 8px;
+    padding-top: 16px;
+}
+
+.fi-sidebar-group-items {
+    padding: 0 8px;
+}
+
 .fi-sidebar, 
 .fi-sidebar-header, 
 .fi-sidebar-nav {
@@ -88,7 +106,6 @@ body {
 
 /* Styling for sidebar navigation items */
 .fi-sidebar-item-button {
-    /* Optional: reduce the gap between icon and text if 16px icon looks too far away */
     gap: 8px;
 }
 
