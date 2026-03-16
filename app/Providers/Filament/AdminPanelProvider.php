@@ -64,25 +64,19 @@ class AdminPanelProvider extends PanelProvider
             ->navigationGroups([
                 'Kolekcje',
                 'Ustawienia',
-            ]);
+            ])
+            ->renderHook(
+                'panels::page.start',
+                fn (): string => Blade::render('<x-filament-custom-header />'),
+            )
+            ->renderHook(
+                'panels::sidebar.footer',
+                fn (): string => view('filament.sidebar-footer')->render(),
+            );
     }
 
     public function register(): void
     {
         parent::register();
-
-        FilamentView::registerRenderHook(
-            'panels::page.start',
-            fn (): string => view('filament.custom-header')->render(),
-        );
-
-        FilamentView::registerRenderHook(
-            'panels::sidebar.footer',
-            fn (): string => Blade::render('
-                <div class="fi-sidebar-user border-t border-gray-200 dark:border-white/10 p-4">
-                    <x-filament-panels::user-menu />
-                </div>
-            '),
-        );
     }
 }

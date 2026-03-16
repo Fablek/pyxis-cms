@@ -1,26 +1,3 @@
-{{-- resources/views/filament/custom-header.blade.php --}}
-@php
-    $heading = 'Dashboard';
-    
-    // Używamy $this, skoro u Ciebie nie wywala błędu 500 
-    if (isset($this)) {
-        if (method_exists($this, 'getHeading')) {
-            $heading = $this->getHeading();
-        } 
-        
-        if (($heading === 'Dashboard' || empty($heading)) && method_exists($this, 'getBreadcrumbs')) {
-            $breadcrumbs = $this->getBreadcrumbs();
-            if (!empty($breadcrumbs)) {
-                $heading = is_array(end($breadcrumbs)) ? array_key_last($breadcrumbs) : end($breadcrumbs);
-            }
-        }
-
-        $headerActions = method_exists($this, 'getCachedHeaderActions') 
-            ? $this->getCachedHeaderActions() 
-            : [];
-    }
-@endphp
-
 <header class="flex h-16 w-full shrink-0 items-center justify-between gap-4 border-b border-gray-200/50 dark:border-white/10 px-6 transition-all backdrop-blur-md rounded-t-xl">
     <div class="flex items-center gap-2 overflow-hidden">
         <button x-data="{}" x-on:click="$store.sidebar.isOpen ? $store.sidebar.close() : $store.sidebar.open()" class="inline-flex items-center justify-center rounded-md size-8 text-gray-500 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors">
@@ -41,7 +18,7 @@
     </div>
 
     <div class="flex items-center gap-3">
-        @if (isset($headerActions) && count($headerActions))
+        @if (count($headerActions))
             <div class="flex items-center gap-2">
                 <x-filament-actions::actions :actions="$headerActions" />
             </div>

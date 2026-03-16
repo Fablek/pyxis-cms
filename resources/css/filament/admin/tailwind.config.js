@@ -12,9 +12,7 @@ export default {
     ],
     theme: {
         extend: {
-            fontFamily: {
-                sans: ['Instrument Sans', 'ui-sans-serif', 'system-ui'],
-            },
+
         },
     },
 }
