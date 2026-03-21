@@ -6,11 +6,19 @@ use App\Http\Controllers\Controller;
 use App\Models\Page;
 use App\Models\Setting;
 use App\Http\Resources\PageResource;
+use App\Services\PageService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class PageController extends Controller
 {
+    protected PageService $pageService;
+
+    public function __construct(PageService $pageService)
+    {
+        $this->pageService = $pageService;
+    }
+
     public function show(Request $request, ?string $slug = null)
     {
         $homepageId = Setting::get('homepage_id');
@@ -24,7 +32,7 @@ class PageController extends Controller
         }
 
         // Choosing the right site
-        $page = $this->resolvePage($slug, $homepageId);
+        $page = $this->pageService->resolvePage($slug, $homepageId);
 
         // Basic Validations (Quick Exits)
         if (!$page || (!$page->isLive() && !$isPreview)) {
@@ -42,37 +50,11 @@ class PageController extends Controller
         }
 
         // Parent validation
-        if (!$isPreview && !$this->allParentsPublished($page)) {
+        if (!$isPreview && !$this->pageService->allParentsPublished($page)) {
             return response()->json(['message' => 'One of the parent pages is not published'], 404);
         }
 
         // Returning data from Resource
         return new PageResource($page);
-    }
-
-    private function resolvePage(?string $slug, ?string $homepageId): ?Page
-    {
-        if (empty($slug) || $slug === '/') {
-            return $homepageId ? Page::find($homepageId) : null;
-        }
-
-        $lastSegment = collect(explode('/', $slug))->last();
-
-        return Page::with('parent')
-            ->where('slug', $lastSegment)
-            ->first();
-    }
-
-    /**
-     * Recursively checks if each parent up the tree is "live"
-     */
-    private function allParentsPublished($page): bool 
-    {
-        $current = $page->parent;
-        while ($current) {
-            if (!$current->isLive()) return false;
-            $current = $current->parent;
-        }
-        return true;
     }
 }
