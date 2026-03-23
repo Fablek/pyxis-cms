@@ -24,12 +24,7 @@ class PageController extends Controller
         $homepageId = Setting::get('homepage_id');
 
         // Check preview
-        $isPreview = false;
-        if ($token = $request->header('X-Pyxis-Preview')) {
-            try {
-                $isPreview = decrypt($token) === 'pyxis-preview-mode';
-            } catch (\Exception $e) {}
-        }
+        $isPreview = $request->attributes->get('is_preview', false);
 
         // Choosing the right site
         $page = $this->pageService->resolvePage($slug, $homepageId);

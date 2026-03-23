@@ -4,25 +4,34 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
+use App\Services\PreviewSignatureService;
 
 class PreviewController extends Controller
 {
+    protected PreviewSignatureService $signatureService;
+
+    public function __construct(PreviewSignatureService $signatureService)
+    {
+        $this->signatureService = $signatureService;
+    }
+
     public function verify(Request $request)
     {
-        $path = $request->query('path');
-        $expires = $request->query('expires');
-        $signature = $request->query('signature');
+        $data = $request->validate([
+            'path' => 'required|string',
+            'expires' => 'required|integer',
+            'signature' => 'required|string',
+        ]);
 
-        $validSignature = hash_hmac('sha256', "{$path}|{$expires}", config('app.key'));
+        $isValid = $this->signatureService->verifySignature($data['path'], $data['expires'], $data['signature']);
 
-        if (!hash_equals($validSignature, $signature)) {
+        if (!$isValid) {
             return response()->json(['valid' => false], 403);
         }
 
         return response()->json([
             'valid' => true,
-            'preview_token' => encrypt('pyxis-preview-mode')
+            'preview_token' => $this->signatureService->generatePreviewToken()
         ]);
     }
 }

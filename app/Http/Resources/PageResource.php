@@ -17,19 +17,7 @@ class PageResource extends JsonResource
     {
         // Check if preview token is in the headers
         $previewHeader = $request->header('X-Pyxis-Preview');
-        $isPreview = false;
-
-        if ($previewHeader) {
-            try {
-                // Decrypt the token. If it's valid, enable preview mode.
-                if (decrypt($previewHeader) === 'pyxis-preview-mode') {
-                    $isPreview = true;
-                }
-            } catch (\Exception $e) {
-                // If the token is invalid or expired, ignore it.
-                $isPreview = false;
-            }
-        }
+        $isPreview = $request->attributes->get('is_preview', false);
 
         // Visibility logic:
         // Only hide content if the page has a password AND we are not in preview mode.
