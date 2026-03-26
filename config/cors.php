@@ -23,7 +23,10 @@ return [
 
     'allowed_origins_patterns' => [],
 
-    'allowed_headers' => ['*', 'X-Pyxis-Preview'],
+    'allowed_headers' => [
+        '*', 
+        env('PYXIS_PREVIEW_HEADER', 'X-Pyxis-Preview')
+    ],
 
     'exposed_headers' => [],
 

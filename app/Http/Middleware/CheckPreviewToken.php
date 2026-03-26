@@ -16,12 +16,13 @@ class CheckPreviewToken
     public function handle(Request $request, Closure $next): Response
     {
         $isPreview = false;
+        $config = config('pyxis.preview');
 
-        if ($token = $request->header('X-Pyxis-Preview')) {
+        if ($token = $request->header($config['header'])) {
             try {
-                $isPreview = decrypt($token) === 'pyxis-preview-mode';
+                $isPreview = decrypt($token) === $config['secret'];
             } catch (\Exception $e) {
-                Log::warning('Invalid X-Pyxis-Preview token.', [
+                Log::warning('Invalid preview token.', [
                     'ip' => $request->ip(),
                     'url' => $request->fullUrl(),
                 ]);

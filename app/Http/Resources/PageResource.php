@@ -16,7 +16,6 @@ class PageResource extends JsonResource
     public function toArray(Request $request): array
     {
         // Check if preview token is in the headers
-        $previewHeader = $request->header('X-Pyxis-Preview');
         $isPreview = $request->attributes->get('is_preview', false);
 
         // Visibility logic:

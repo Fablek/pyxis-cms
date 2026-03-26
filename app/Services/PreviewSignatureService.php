@@ -16,6 +16,7 @@ class PreviewSignatureService
     }
 
     public function generatePreviewToken(): string {
-        return encrypt('pyxis-preview-mode');
+        $config = config('pyxis.preview');
+        return encrypt($config['secret']);
     }
 }
