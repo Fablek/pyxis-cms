@@ -23,13 +23,10 @@ class PageService
     /**
      * Recursively checks if each parent up the tree is "live"
      */
-    public function allParentsPublished($page): bool 
+    public function allParentsPublished(Page $page): bool 
     {
-        $current = $page->parent;
-        while ($current) {
-            if (!$current->isLive()) return false;
-            $current = $current->parent;
-        }
-        return true;
+        return $page->ancestors()
+            ->get()
+            ->every(fn($parent) => $parent->isLive());
     }
 }

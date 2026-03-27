@@ -10,10 +10,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Staudenmeir\LaravelAdjacencyList\Eloquent\HasRecursiveRelationships;
 
 class Page extends Model
 {
-    use HasFactory, HasUuids;
+    use HasFactory, HasUuids, HasRecursiveRelationships;
 
     protected $fillable = [
         'title',
@@ -71,13 +72,20 @@ class Page extends Model
     {
         return Attribute::make(
             get: function() {
-                // If page have parent, get his full url
-                if ($this->parent_id && $this->parent) {
-                    return rtrim($this->parent->full_url, '/') . '/' . $this->slug;
+                if (is_null($this->slug)) {
+                    return '/';
                 }
 
-                // If page is main return /
-                return '/' . $this->slug;
+                $collection = $this->relationLoaded('ancestorsAndSelf') 
+                    ? $this->ancestorsAndSelf 
+                    : $this->ancestorsAndSelf()->get();
+
+                $slugs = $collection
+                    ->reverse()
+                    ->pluck('slug')
+                    ->filter();
+
+                return '/' . $slugs->implode('/');
             },
         );
     }
