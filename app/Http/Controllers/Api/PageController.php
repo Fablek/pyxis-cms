@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Page;
-use App\Models\Setting;
 use App\Http\Resources\PageResource;
 use App\Services\PageService;
 use Illuminate\Http\JsonResponse;
@@ -21,35 +20,16 @@ class PageController extends Controller
 
     public function show(Request $request, ?string $slug = null)
     {
-        $homepageId = Setting::get('homepage_id');
-
         // Check preview
         $isPreview = $request->attributes->get('is_preview', false);
 
-        // Choosing the right site
-        $page = $this->pageService->resolvePage($slug, $homepageId);
+        try {
+            // Choosing the right site
+            $page = $this->pageService->getPageForViewing($slug, $isPreview);
 
-        // Basic Validations (Quick Exits)
-        if (!$page || (!$page->isLive() && !$isPreview)) {
-            return response()->json(['message' => 'Page not found'], 404);
+            return new PageResource($page);
+        } catch (\App\Exceptions\PageNotFoundException $e) {
+            return response()->json(['message' => $e->getMessage()], 404);
         }
-
-        // Blocking access to the home page by its slug
-        if ($slug && (string)$page->id === (string)$homepageId) {
-            return response()->json(['message' => 'Use root path for homepage'], 404);
-        }
-
-        // Path validation (for subpages only)
-        if ($slug && trim($page->full_url, '/') !== trim($slug, '/')) {
-            return response()->json(['message' => 'Path mismatch'], 404);
-        }
-
-        // Parent validation
-        if (!$isPreview && !$this->pageService->allParentsPublished($page)) {
-            return response()->json(['message' => 'One of the parent pages is not published'], 404);
-        }
-
-        // Returning data from Resource
-        return new PageResource($page);
     }
 }
