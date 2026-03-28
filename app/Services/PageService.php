@@ -13,11 +13,14 @@ class PageService
             return $homepageId ? Page::find($homepageId) : null;
         }
 
-        $lastSegment = collect(explode('/', $slug))->last();
+        $segments = explode('/', ltrim($slug, '/'));
+        $lastSegment = last($segments);
 
-        return Page::with('parent')
-            ->where('slug', $lastSegment)
-            ->first();
+        $candidates = Page::where('slug', $lastSegment)->get();
+
+        return $candidates->first(function ($page) use ($slug) {
+            return trim($page->full_url, '/') === trim($slug, '/');
+        });
     }
 
     /**
