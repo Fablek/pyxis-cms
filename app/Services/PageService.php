@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Models\Page;
 use App\Models\Setting;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class PageService
 {
