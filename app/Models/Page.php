@@ -96,22 +96,6 @@ class Page extends Model
     }
 
     /**
-     * The main method serving content to the API.
-     * Decides whether to send the LIVE or DRAFT version.
-     */
-    public function getResolvedContent(bool $isPreview = false): ?array 
-    {
-        if ($isPreview) {
-            // In preview mode, the scratchpad takes priority.
-            // If the draft is empty, fallback to the original content.
-            return $this->content_draft ?? $this->content;
-        }
-
-        // For regular users, always only official content.
-        return $this->content;
-    }
-
-    /**
      * Check if the resource is currently live and visible to users.
      * * The resource is considered "live" if:
      * 1. The status is explicitly set to 'published'.

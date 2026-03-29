@@ -38,4 +38,20 @@ class PageResource extends JsonResource
             'is_preview' => $isPreview,
         ];
     }
+
+    /**
+     * The main method serving content to the API.
+     * Decides whether to send the LIVE or DRAFT version.
+     */
+    private function getResolvedContent(bool $isPreview = false): ?array 
+    {
+        if ($isPreview) {
+            // In preview mode, the scratchpad takes priority.
+            // If the draft is empty, fallback to the original content.
+            return $this->content_draft ?? $this->content;
+        }
+
+        // For regular users, always only official content.
+        return $this->content;
+    }
 }
