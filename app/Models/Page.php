@@ -5,7 +5,7 @@ namespace App\Models;
 use App\Enums\PageStatus;
 use App\Enums\PageVisibility;
 
-use App\Models\Setting;
+use App\Observers\PageObserver;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -13,8 +13,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Staudenmeir\LaravelAdjacencyList\Eloquent\HasRecursiveRelationships;
 
+#[ObservedBy([PageObserver::class])]
 class Page extends Model
 {
     use HasFactory, HasUuids, HasRecursiveRelationships;
@@ -55,18 +57,6 @@ class Page extends Model
     public function children(): HasMany
     {
         return $this->hasMany(Page::class, 'parent_id');
-    }
-
-    protected static function booted() {
-        static::saving(function ($page) {
-            $homepageId = Setting::get('homepage_id');
-
-            // If this page has just become/is the home page
-            if ($homepageId && (string)$page->id === (string)$homepageId) {
-                $page->slug = null;
-                $page->parent_id = null;
-            }
-        });
     }
 
     /**
