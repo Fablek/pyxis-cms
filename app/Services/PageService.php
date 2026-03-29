@@ -16,7 +16,7 @@ class PageService
         $segments = explode('/', ltrim($slug, '/'));
         $lastSegment = last($segments);
 
-        $candidates = Page::where('slug', $lastSegment)->get();
+        $candidates = Page::with('ancestorsAndSelf')->where('slug', $lastSegment)->get();
 
         return $candidates->first(function ($page) use ($slug) {
             return trim($page->full_url, '/') === trim($slug, '/');
@@ -61,9 +61,7 @@ class PageService
      */
     public function allParentsPublished(Page $page): bool 
     {
-        return $page->ancestors()
-            ->get()
-            ->every(fn($parent) => $parent->isLive());
+        return $page->ancestors->every(fn($parent) => $parent->isLive());
     }
 
     /**
