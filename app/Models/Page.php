@@ -2,6 +2,9 @@
 
 namespace App\Models;
 
+use App\Enums\PageStatus;
+use App\Enums\PageVisibility;
+
 use App\Models\Setting;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -31,6 +34,8 @@ class Page extends Model
     ];
 
     protected $casts = [
+        'status' => PageStatus::class,
+        'visibility' => PageVisibility::class,
         'content' => 'array',
         'content_draft' => 'array',
         'seo' => 'array',
@@ -131,8 +136,8 @@ class Page extends Model
      */
     public function isLive(): bool
     {
-        return $this->status === 'published' &&
-            $this->visibility !== 'private' &&
+        return $this->status === PageStatus::PUBLISHED &&
+            $this->visibility !== PageVisibility::PRIVATE &&
             ($this->published_at === null || $this->published_at <= now());
     }
 }

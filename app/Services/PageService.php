@@ -7,7 +7,7 @@ use App\Models\Setting;
 
 class PageService
 {
-    public function resolvePage(?string $slug, ?string $homepageId): ?Page
+    private function resolvePage(?string $slug, ?string $homepageId): ?Page
     {
         if (empty($slug) || $slug === '/') {
             return $homepageId ? Page::find($homepageId) : null;

@@ -2,6 +2,8 @@
 
 namespace App\Http\Resources;
 
+use App\Enums\PageVisibility;
+
 use App\Models\Setting;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -20,7 +22,7 @@ class PageResource extends JsonResource
 
         // Visibility logic:
         // Only hide content if the page has a password AND we are not in preview mode.
-        $isProtected = $this->visibility === 'password';
+        $isProtected = $this->visibility === PageVisibility::PASSWORD;
         $shouldHideContent = $isProtected && !$isPreview;
 
         $isHomepage = (string)$this->id === (string)Setting::get('homepage_id');
