@@ -112,21 +112,6 @@ class Page extends Model
     }
 
     /**
-     * Generates a secure preview link with an HMAC signature.
-     */
-    public function getPreviewUrl(): string
-    {
-        $expires = now()->addMinutes(30)->timestamp;
-        $path = ($this->full_url && $this->full_url !== '/') ? ltrim($this->full_url, '/') : 'homepage';
-
-        $signature = hash_hmac('sha256', "{$path}|{$expires}", config('app.key'));
-
-        $frontendUrl = config('app.frontend_url', 'http://localhost:3000');
-
-        return "{$frontendUrl}/api/preview?path={$path}&expires={$expires}&signature={$signature}";
-    }
-
-    /**
      * Check if the resource is currently live and visible to users.
      * * The resource is considered "live" if:
      * 1. The status is explicitly set to 'published'.

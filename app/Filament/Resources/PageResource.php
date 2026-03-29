@@ -7,6 +7,7 @@ use App\Filament\Resources\PageResource\Pages;
 use App\Filament\Resources\PageResource\RelationManagers;
 use App\Models\Page;
 use App\Models\Setting;
+use App\Services\PageService;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -156,7 +157,7 @@ class PageResource extends Resource
                                         ->label(__('admin.pages.actions.preview'))
                                         ->color('gray')
                                         ->icon('heroicon-o-eye')
-                                        ->url(fn ($record) => $record->getPreviewUrl())
+                                        ->url(fn ($record) => app(PageService::class)->getPreviewUrl($record))
                                         ->visible(fn ($record) => $record !== null)
                                         ->openUrlInNewTab()
                                         ->extraAttributes([

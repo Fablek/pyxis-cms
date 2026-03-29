@@ -65,4 +65,19 @@ class PageService
             ->get()
             ->every(fn($parent) => $parent->isLive());
     }
+
+    /**
+     * Generates a secure preview link with an HMAC signature.
+     */
+    public function getPreviewUrl(Page $page): string
+    {
+        $expires = now()->addMinutes(30)->timestamp;
+        $path = ($page->full_url && $page->full_url !== '/') ? ltrim($page->full_url, '/') : 'homepage';
+
+        $signature = hash_hmac('sha256', "{$path}|{$expires}", config('app.key'));
+
+        $frontendUrl = config('app.frontend_url', 'http://localhost:3000');
+
+        return "{$frontendUrl}/api/preview?path={$path}&expires={$expires}&signature={$signature}";
+    }
 }
