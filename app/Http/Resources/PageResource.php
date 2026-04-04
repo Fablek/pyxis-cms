@@ -30,28 +30,14 @@ class PageResource extends JsonResource
         return [
             'id' => $this->id,
             'title' => $this->title,
-            'content' => $shouldHideContent ? null : $this->getResolvedContent($isPreview),
+            'content' => $shouldHideContent 
+                ? null 
+                : ($isPreview ? ($this->content_draft ?? $this->content) : $this->content),
             'seo' => $this->seo,
             'full_url' => $isHomepage ? '/' : $this->full_url,
             'published_at' => $this->published_at,
             'is_password_protected' => $isProtected,
             'is_preview' => $isPreview,
         ];
-    }
-
-    /**
-     * The main method serving content to the API.
-     * Decides whether to send the LIVE or DRAFT version.
-     */
-    private function getResolvedContent(bool $isPreview = false): ?array 
-    {
-        if ($isPreview) {
-            // In preview mode, the scratchpad takes priority.
-            // If the draft is empty, fallback to the original content.
-            return $this->content_draft ?? $this->content;
-        }
-
-        // For regular users, always only official content.
-        return $this->content;
     }
 }
