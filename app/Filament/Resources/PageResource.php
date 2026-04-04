@@ -81,15 +81,14 @@ class PageResource extends Resource
                             ->unique(ignoreRecord: true)
                             ->prefix(function (Forms\Get $get) {
                                 $parentId = $get('parent_id');
-                                if ($parentId) {
-                                    // Download the parent servant from the database
-                                    $parent = Page::find($parentId);
-                                    
-                                    if ($parent) {
-                                        return rtrim($parent->full_url, '/') . '/';
-                                    }
+                                
+                                if (!$parentId) {
+                                    return '/';
                                 }
-                                return '/';
+
+                                $parent = once(fn () => Page::with('ancestors')->find($parentId));
+
+                                return $parent ? rtrim($parent->full_url, '/') . '/' : '/';
                             })
                             // Prevent the user from entering slashes,
                             // because the prefix already adds them automatically
