@@ -7,6 +7,9 @@ use App\Filament\Resources\PageResource\Pages;
 use App\Filament\Resources\PageResource\RelationManagers;
 use App\Models\Page;
 use App\Models\Setting;
+use App\Services\PageService;
+use App\Enums\PageStatus;
+use App\Enums\PageVisibility;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -78,15 +81,14 @@ class PageResource extends Resource
                             ->unique(ignoreRecord: true)
                             ->prefix(function (Forms\Get $get) {
                                 $parentId = $get('parent_id');
-                                if ($parentId) {
-                                    // Download the parent servant from the database
-                                    $parent = Page::find($parentId);
-                                    
-                                    if ($parent) {
-                                        return rtrim($parent->full_url, '/') . '/';
-                                    }
+                                
+                                if (!$parentId) {
+                                    return '/';
                                 }
-                                return '/';
+
+                                $parent = once(fn () => Page::with('ancestors')->find($parentId));
+
+                                return $parent ? rtrim($parent->full_url, '/') . '/' : '/';
                             })
                             // Prevent the user from entering slashes,
                             // because the prefix already adds them automatically
@@ -119,21 +121,21 @@ class PageResource extends Resource
                                 Select::make('status')
                                     ->label(__('admin.pages.fields.status'))
                                     ->options([
-                                        'draft' => __('admin.pages.status.draft'),
-                                        'published' => __('admin.pages.status.published'),
+                                        PageStatus::DRAFT->value => __('admin.pages.status.draft'),
+                                        PageStatus::PUBLISHED->value => __('admin.pages.status.published'),
                                     ])
-                                    ->default('draft')
+                                    ->default(PageStatus::DRAFT)
                                     ->native(false)
                                     ->required(),
                                 
                                 Select::make('visibility')
                                     ->label(__('admin.pages.fields.visibility'))
                                     ->options([
-                                        'public' => __('admin.pages.visibility.public'),
-                                        'private' => __('admin.pages.visibility.private'),
-                                        'password' => __('admin.pages.visibility.password'),
+                                        PageVisibility::PUBLIC->value => __('admin.pages.visibility.public'),
+                                        PageVisibility::PRIVATE->value => __('admin.pages.visibility.private'),
+                                        PageVisibility::PASSWORD->value => __('admin.pages.visibility.password'),
                                     ])
-                                    ->default('public')
+                                    ->default(PageVisibility::PUBLIC)
                                     ->native(false)
                                     ->required()
                                     ->live(),
@@ -147,8 +149,8 @@ class PageResource extends Resource
                                     ->label(__('admin.pages.fields.password'))
                                     ->password()
                                     ->revealable()
-                                    ->requiredIf('visibility', 'password')
-                                    ->visible(fn ($get) => $get('visibility') === 'password'),
+                                    ->requiredIf('visibility', PageVisibility::PASSWORD->value)
+                                    ->visible(fn ($get) => $get('visibility') === PageVisibility::PASSWORD->value),
 
                                 Actions::make([
                                     // Button preview
@@ -156,7 +158,7 @@ class PageResource extends Resource
                                         ->label(__('admin.pages.actions.preview'))
                                         ->color('gray')
                                         ->icon('heroicon-o-eye')
-                                        ->url(fn ($record) => $record->getPreviewUrl())
+                                        ->url(fn ($record) => app(PageService::class)->getPreviewUrl($record))
                                         ->visible(fn ($record) => $record !== null)
                                         ->openUrlInNewTab()
                                         ->extraAttributes([
@@ -256,19 +258,19 @@ class PageResource extends Resource
                 TextColumn::make('status')
                     ->label(__('admin.pages.fields.status'))
                     ->badge()
-                    ->formatStateUsing(function (string $state, Page $record): string {
-                        if ($state === 'published' && $record->published_at > now()) {
+                    ->formatStateUsing(function (PageStatus $state, Page $record): string {
+                        if ($state === PageStatus::PUBLISHED && $record->published_at > now()) {
                             return __('admin.pages.status.scheduled');
                         }
-                        return __("admin.pages.status.{$state}");
+                        return __("admin.pages.status.{$state->value}");
                     })
-                    ->color(function (string $state, Page $record): string {
-                        if ($state === 'published' && $record->published_at > now()) {
+                    ->color(function (PageStatus $state, Page $record): string {
+                        if ($state === PageStatus::PUBLISHED && $record->published_at > now()) {
                             return 'info';
                         }
                         return match ($state) {
-                            'published' => 'success',
-                            'draft' => 'warning',
+                            PageStatus::PUBLISHED => 'success',
+                            PageStatus::DRAFT => 'warning',
                             default => 'gray',
                         };
                     }),
@@ -276,18 +278,16 @@ class PageResource extends Resource
                 TextColumn::make('visibility')
                     ->label(__('admin.pages.fields.visibility'))
                     ->badge()
-                    ->formatStateUsing(fn (string $state): string => __("admin.pages.visibility.{$state}"))
-                    ->color(fn (string $state): string => match ($state) {
-                        'public' => 'success',
-                        'private' => 'gray',
-                        'password' => 'info',
-                        default => 'gray',
+                    ->formatStateUsing(fn (PageVisibility $state): string => __("admin.pages.visibility.{$state->value}"))
+                    ->color(fn (PageVisibility $state): string => match ($state) {
+                        PageVisibility::PUBLIC => 'success',
+                        PageVisibility::PRIVATE => 'gray',
+                        PageVisibility::PASSWORD => 'info',
                     })
-                    ->icon(fn (string $state): string => match ($state) {
-                        'public' => 'heroicon-o-globe-alt',
-                        'private' => 'heroicon-o-lock-closed',
-                        'password' => 'heroicon-o-key',
-                        default => 'heroicon-o-globe-alt',
+                    ->icon(fn (PageVisibility $state): string => match ($state) {
+                        PageVisibility::PUBLIC => 'heroicon-o-globe-alt',
+                        PageVisibility::PRIVATE => 'heroicon-o-lock-closed',
+                        PageVisibility::PASSWORD => 'heroicon-o-key',
                     }),
 
                 TextColumn::make('published_at')
@@ -302,8 +302,8 @@ class PageResource extends Resource
             ->filters([
                 SelectFilter::make('status')
                     ->options([
-                        'draft' => __('admin.pages.status.draft'),
-                        'published' => __('admin.pages.status.published'),
+                        PageStatus::DRAFT->value => __('admin.pages.status.draft'),
+                        PageStatus::PUBLISHED->value => __('admin.pages.status.published'),
                     ]),
             ])
             ->actions([

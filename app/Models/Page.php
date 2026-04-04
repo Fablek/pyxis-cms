@@ -2,7 +2,10 @@
 
 namespace App\Models;
 
-use App\Models\Setting;
+use App\Enums\PageStatus;
+use App\Enums\PageVisibility;
+
+use App\Observers\PageObserver;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -10,10 +13,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Staudenmeir\LaravelAdjacencyList\Eloquent\HasRecursiveRelationships;
 
+#[ObservedBy([PageObserver::class])]
 class Page extends Model
 {
-    use HasFactory, HasUuids;
+    use HasFactory, HasUuids, HasRecursiveRelationships;
 
     protected $fillable = [
         'title',
@@ -30,6 +36,8 @@ class Page extends Model
     ];
 
     protected $casts = [
+        'status' => PageStatus::class,
+        'visibility' => PageVisibility::class,
         'content' => 'array',
         'content_draft' => 'array',
         'seo' => 'array',
@@ -51,18 +59,6 @@ class Page extends Model
         return $this->hasMany(Page::class, 'parent_id');
     }
 
-    protected static function booted() {
-        static::saving(function ($page) {
-            $homepageId = Setting::get('homepage_id');
-
-            // If this page has just become/is the home page
-            if ($homepageId && (string)$page->id === (string)$homepageId) {
-                $page->slug = null;
-                $page->parent_id = null;
-            }
-        });
-    }
-
     /**
      * Calculates the full URL path of a page based on its parent hierarchy.
      * Example: /about-us/team/jan-smith
@@ -71,46 +67,22 @@ class Page extends Model
     {
         return Attribute::make(
             get: function() {
-                // If page have parent, get his full url
-                if ($this->parent_id && $this->parent) {
-                    return rtrim($this->parent->full_url, '/') . '/' . $this->slug;
+                if (is_null($this->slug)) {
+                    return '/';
                 }
 
-                // If page is main return /
-                return '/' . $this->slug;
+                $collection = $this->relationLoaded('ancestorsAndSelf') 
+                    ? $this->ancestorsAndSelf 
+                    : $this->ancestorsAndSelf()->get();
+
+                $slugs = $collection
+                    ->reverse()
+                    ->pluck('slug')
+                    ->filter();
+
+                return '/' . $slugs->implode('/');
             },
         );
-    }
-
-    /**
-     * The main method serving content to the API.
-     * Decides whether to send the LIVE or DRAFT version.
-     */
-    public function getResolvedContent(bool $isPreview = false): ?array 
-    {
-        if ($isPreview) {
-            // In preview mode, the scratchpad takes priority.
-            // If the draft is empty, fallback to the original content.
-            return $this->content_draft ?? $this->content;
-        }
-
-        // For regular users, always only official content.
-        return $this->content;
-    }
-
-    /**
-     * Generates a secure preview link with an HMAC signature.
-     */
-    public function getPreviewUrl(): string
-    {
-        $expires = now()->addMinutes(30)->timestamp;
-        $path = ($this->full_url && $this->full_url !== '/') ? ltrim($this->full_url, '/') : 'homepage';
-
-        $signature = hash_hmac('sha256', "{$path}|{$expires}", config('app.key'));
-
-        $frontendUrl = config('app.frontend_url', 'http://localhost:3000');
-
-        return "{$frontendUrl}/api/preview?path={$path}&expires={$expires}&signature={$signature}";
     }
 
     /**
@@ -123,8 +95,8 @@ class Page extends Model
      */
     public function isLive(): bool
     {
-        return $this->status === 'published' &&
-            $this->visibility !== 'private' &&
+        return $this->status === PageStatus::PUBLISHED &&
+            $this->visibility !== PageVisibility::PRIVATE &&
             ($this->published_at === null || $this->published_at <= now());
     }
 }

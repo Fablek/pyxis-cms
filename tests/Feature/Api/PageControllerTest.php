@@ -4,6 +4,9 @@ use App\Models\Page;
 use App\Models\Setting;
 use App\Models\Role;
 
+use App\Enums\PageStatus;
+use App\Enums\PageVisibility;
+
 it('returns the correct homepage based on global settings', function () {
     // Arrange
     // Set lang
@@ -56,7 +59,7 @@ it('returns 404 for pages scheduled for the future', function () {
     // Arrange: Page will be post tommorow
     $fururePage = Page::factory()->create([
         'slug' => 'future',
-        'status' => 'published',
+        'status' => PageStatus::PUBLISHED,
         'published_at' => now()->addDay(),
     ]);
 
@@ -71,7 +74,7 @@ it('returns 404 for draft pages', function () {
     // Arrange: Page with draft status
     $draftPage = Page::factory()->create([
         'slug' => 'draft-page',
-        'status' => 'draft',
+        'status' => PageStatus::DRAFT,
         'published_at' => now()->subDay(),
     ]);
 
@@ -86,7 +89,7 @@ it('returns 404 for private pages', function () {
     // Arrange: Page with private visibility
     $privatePage = Page::factory()->create([
         'slug' => 'private-page',
-        'visibility' => 'private',
+        'visibility' => PageVisibility::PRIVATE,
         'published_at' => now()->subDay(),
     ]);
 
@@ -101,8 +104,8 @@ it('returns 200 but hides content for password protected pages', function () {
     // Arrange: Protected page
     $passwordPage = Page::factory()->create([
         'slug' => 'password-page',
-        'status' => 'published',
-        'visibility' => 'password',
+        'status' => PageStatus::PUBLISHED,
+        'visibility' => PageVisibility::PASSWORD,
         'content' => ['blocks' => 'this should be hidden'],
     ]);
 
