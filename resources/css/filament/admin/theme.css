@@ -1,11 +1,11 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@import "../../../../vendor/filament/filament/resources/css/theme.css";
 
-/* Import default Filament styles */
-@import '../../../../vendor/filament/filament/resources/css/index.css';
-
-@config "tailwind.config.js";
+@source "../../../../app/Filament";
+@source "../../../../resources/views/filament";
+@source "../../../../resources/views/components";
+@source "../../../../vendor/filament";
+@source "../../../../vendor/awcodes/filament-curator";
 
 :root {
     --sidebar-width: 250px !important; 
@@ -35,6 +35,10 @@
 .fi-sidebar-collapsed .fi-sidebar-header {
     justify-content: center !important;
     padding-left: 0 !important;
+}
+
+.fi-logo {
+    margin: 0;
 }
 
 /* Prevent logo from being constrained */
@@ -71,6 +75,10 @@ body {
 .fi-main-ctn {
     min-height: 100vh !important;
     background-color: transparent !important;
+}
+
+.fi-page-header-main-ctn {
+    padding: 24px;
 }
 
 /* --- 3. SIDEBAR STYLING --- */
@@ -119,6 +127,11 @@ body {
 .fi-sidebar-item-label {
     font-size: 14px;
     line-height: 1.25rem; /* 20px */
+}
+
+/* Sidebar footer */
+.fi-sidebar-footer {
+    margin: 0;
 }
 
 /* EXTREME BORDER & RING RESET 
