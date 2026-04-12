@@ -13,7 +13,22 @@ class EditUser extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
+            Actions\Action::make('save')
+                ->label(__('admin.pages.actions.save'))
+                ->color('primary')
+                ->submit('save'),
+
+            Actions\Action::make('cancel')
+                ->label(__('admin.pages.actions.cancel') ?? 'Anuluj')
+                ->color('gray')
+                ->url($this->getResource()::getUrl('index')),
+
             Actions\DeleteAction::make(),
         ];
+    }
+
+    protected function getFormActions(): array
+    {
+        return [];
     }
 }

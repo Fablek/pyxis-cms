@@ -30,10 +30,14 @@ return [
             'password' => 'Chroniona hasłem',
         ],
         'actions' => [
-            'save' => 'Zapisz szkic',
+            'draft' => 'Zapisz szkic',
+            'save' => 'Zapisz',
+            'cancel' => 'Anuluj',
             'publish' => 'Publikuj zmiany',
             'preview' => 'Podgląd na żywo',
             'delete' => 'Usuń stronę',
+            'create' => 'Utwórz',
+            'create_another' => 'Utwórz i utwórz kolejny',
         ],
         'modals' => [
             'delete_confirm' => 'Czy na pewno chcesz usunąć tę stronę?',
