@@ -77,6 +77,10 @@ body {
     background-color: transparent !important;
 }
 
+.fi-page-header-main-ctn {
+    padding: 24px;
+}
+
 /* --- 3. SIDEBAR STYLING --- */
 
 /* Sidebar Background 
