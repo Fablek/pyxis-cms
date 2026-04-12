@@ -30,10 +30,14 @@ return [
             'password' => 'Password Protected',
         ],
         'actions' => [
-            'save' => 'Save Draft',
+            'draft' => 'Save Draft',
+            'save' => 'Save Changes',
+            'cancel' => 'Cancel',
             'publish' => 'Publish Changes',
             'preview' => 'Live Preview',
             'delete' => 'Delete Page',
+            'create' => 'Create',
+            'create_another' => 'Create and create another',
         ],
         'modals' => [
             'delete_confirm' => 'Are you sure you want to delete this page?',
@@ -50,6 +54,7 @@ return [
         'users' => 'Users',
         'settings' => 'Settings',
         'pages' => 'Pages',
+        'media' => 'Media',
     ],
     'users' => [
         'label' => 'User',
@@ -89,5 +94,10 @@ return [
         'placeholders' => [
             'select_page' => 'Select a page from the list...',
         ],
+    ],
+    'media' => [
+        'label' => 'Media',
+        'plural' => 'Media Library',
+        'nav_label' => 'Media Library',
     ],
 ];

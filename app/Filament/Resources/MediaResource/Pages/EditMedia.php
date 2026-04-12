@@ -1,20 +1,17 @@
 <?php
 
-namespace App\Filament\Resources\UserResource\Pages;
+namespace App\Filament\Resources\MediaResource\Pages;
 
-use App\Filament\Resources\UserResource;
+use Awcodes\Curator\Resources\Media\Pages\EditMedia as BaseEditMedia;
 use Filament\Actions;
-use Filament\Resources\Pages\EditRecord;
 
-class EditUser extends EditRecord
+class EditMedia extends BaseEditMedia
 {
-    protected static string $resource = UserResource::class;
-
-    protected function getHeaderActions(): array
+    public function getHeaderActions(): array
     {
         return [
             Actions\Action::make('save')
-                ->label(__('admin.pages.actions.save'))
+                ->label(__('admin.pages.actions.save') ?? 'Zapisz')
                 ->color('primary')
                 ->submit('save'),
 
@@ -27,7 +24,7 @@ class EditUser extends EditRecord
         ];
     }
 
-    protected function getFormActions(): array
+    public function getFormActions(): array
     {
         return [];
     }

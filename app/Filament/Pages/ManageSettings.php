@@ -71,14 +71,19 @@ class ManageSettings extends Page
             ->statePath('data');
     }
 
-    protected function getFormActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Action::make('save')
                 ->label(__('admin.settings.save_button'))
                 ->color('primary')
-                ->submit('save'),
+                ->action('save'),
         ];
+    }
+
+    protected function getFormActions(): array
+    {
+        return [];
     }
 
     public function save(): void

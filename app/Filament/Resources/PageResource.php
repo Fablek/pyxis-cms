@@ -182,7 +182,7 @@ class PageResource extends Resource
                                     }),
 
                                 Action::make('save')
-                                    ->label(__('admin.pages.actions.save'))
+                                    ->label(__('admin.pages.actions.draft'))
                                     ->color('primary')
                                     ->submit('save'),
 
