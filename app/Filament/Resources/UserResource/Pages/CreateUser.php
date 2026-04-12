@@ -16,7 +16,7 @@ class CreateUser extends CreateRecord
             Actions\Action::make('create')
                 ->label(__('admin.pages.actions.create') ?? 'Utwórz')
                 ->color('primary')
-                ->submit('create'),
+                ->action('create'),
 
             Actions\Action::make('createAnother')
                 ->label(__('admin.pages.actions.create_another') ?? 'Utwórz i utwórz kolejny')

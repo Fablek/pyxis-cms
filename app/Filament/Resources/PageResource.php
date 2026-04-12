@@ -160,14 +160,25 @@ class PageResource extends Resource
                                     ->color('success')
                                     ->icon('heroicon-o-rocket-launch')
                                     ->requiresConfirmation()
-                                    ->action(function ($record, $livewire) {
-                                        $livewire->save();
-                                        $record->update(['content' => $record->content_draft]);
+                                    ->action(function ($livewire) {
+                                        if (method_exists($livewire, 'save')) {
+                                            $livewire->save();
+                                        } else {
+                                            $livewire->create();
+                                        }
+
+                                        $record = $livewire->getRecord();
+
+                                        $record->update([
+                                            'content' => $record->content_draft,
+                                            'status' => PageStatus::PUBLISHED,
+                                        ]);
                                     
                                         try {
                                             $frontendUrl = config('app.frontend_url', 'http://localhost:3000');
                                             $revalidateToken = config('app.revalidate_token', 'super-secret-token');
-                                            Http::post("{$frontendUrl}/api/revalidate", [
+                                            
+                                            \Illuminate\Support\Facades\Http::post("{$frontendUrl}/api/revalidate", [
                                                 'secret' => $revalidateToken,
                                                 'path' => $record->full_url === '/' ? '/' : $record->full_url,
                                             ]);
@@ -175,27 +186,27 @@ class PageResource extends Resource
                                             \Log::error("Revalidation error: " . $e->getMessage());
                                         }
 
-                                        Notification::make()
+                                        \Filament\Notifications\Notification::make()
                                             ->title(__('admin.pages.notifications.published'))
                                             ->success()
                                             ->send();
                                     }),
 
-                                Action::make('save')
-                                    ->label(__('admin.pages.actions.draft'))
-                                    ->color('primary')
-                                    ->submit('save'),
+                                    Action::make('save')
+                                        ->label(__('admin.pages.actions.draft'))
+                                        ->color('primary')
+                                        ->submit('save'),
 
-                                Action::make('delete')
-                                    ->label(__('admin.pages.actions.delete'))
-                                    ->color('danger')
-                                    ->icon('heroicon-o-trash')
-                                    ->requiresConfirmation()
-                                    ->hidden(fn ($operation) => $operation === 'create')
-                                    ->action(function ($record, $livewire) {
-                                        $record->delete();
-                                        return redirect($livewire->getResource()::getUrl('index'));
-                                    }),
+                                    Action::make('delete')
+                                        ->label(__('admin.pages.actions.delete'))
+                                        ->color('danger')
+                                        ->icon('heroicon-o-trash')
+                                        ->requiresConfirmation()
+                                        ->hidden(fn ($operation) => $operation === 'create')
+                                        ->action(function ($record, $livewire) {
+                                            $record->delete();
+                                            return redirect($livewire->getResource()::getUrl('index'));
+                                        }),
                             ]),
                         ])
                         ->columns(1),

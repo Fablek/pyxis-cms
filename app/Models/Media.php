@@ -9,4 +9,9 @@ class Media extends CuratorMedia
     use HasUuids;
     
     protected $table = 'media';
+
+    protected static $unguarded = true; 
+
+    public $incrementing = false;
+    protected $keyType = 'string';
 }
