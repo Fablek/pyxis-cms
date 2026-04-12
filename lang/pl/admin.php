@@ -30,10 +30,14 @@ return [
             'password' => 'Chroniona hasłem',
         ],
         'actions' => [
-            'save' => 'Zapisz szkic',
+            'draft' => 'Zapisz szkic',
+            'save' => 'Zapisz',
+            'cancel' => 'Anuluj',
             'publish' => 'Publikuj zmiany',
             'preview' => 'Podgląd na żywo',
             'delete' => 'Usuń stronę',
+            'create' => 'Utwórz',
+            'create_another' => 'Utwórz i utwórz kolejny',
         ],
         'modals' => [
             'delete_confirm' => 'Czy na pewno chcesz usunąć tę stronę?',
@@ -50,6 +54,7 @@ return [
         'users' => 'Użytkownicy',
         'settings' => 'Ustawienia',
         'pages' => 'Strony',
+        'media' => 'Media',
     ],
     'users' => [
         'label' => 'Użytkownik',
@@ -133,5 +138,10 @@ return [
         'placeholders' => [
             'select_page' => 'Wybierz stronę z listy...',
         ],
+    ],
+    'media' => [
+        'label' => 'Media',
+        'plural' => 'Biblioteka mediów',
+        'nav_label' => 'Biblioteka mediów',
     ],
 ];
