@@ -38,7 +38,7 @@ return [
     'image_resize_target_height' => null,
     'image_resize_target_width' => null,
     'is_limited_to_directory' => false,
-    'is_tenant_aware' => true,
+    'is_tenant_aware' => false,
     'tenant_ownership_relationship_name' => 'tenant',
     'max_size' => 5000,
     'model' => \App\Models\Media::class,

@@ -1,21 +1,12 @@
 <?php
-
 namespace App\Models;
 
-use Awcodes\Curator\Models\Media as CuratorMedia;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Awcodes\Curator\Models\Media as CuratorMedia;
 
 class Media extends CuratorMedia
 {
     use HasUuids;
-
-    /**
-     * Disable auto-incrementing because we use UUID.
-     */
-    public $incrementing = false;
-
-    /**
-     * Define the key type as string.
-     */
-    protected $keyType = 'string';
+    
+    protected $table = 'media';
 }

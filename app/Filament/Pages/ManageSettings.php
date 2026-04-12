@@ -4,18 +4,20 @@ namespace App\Filament\Pages;
 
 use App\Models\Setting;
 use App\Models\Page as PageModel;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Form;
+
 use Filament\Pages\Page;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
-use Filament\Forms\Components\Grid;
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid;
+use Filament\Forms\Components\Select;
 
 class ManageSettings extends Page
 {
-    protected static ?string $navigationIcon = 'heroicon-o-cog-6-tooth';
-    protected static string $view = 'filament.pages.manage-settings';
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-cog-6-tooth';
+    
+    protected string $view = 'filament.pages.manage-settings';
 
     public static function getNavigationLabel(): string
     {
@@ -37,15 +39,15 @@ class ManageSettings extends Page
         ]);
     }
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 Section::make(__('admin.settings.sections.config'))
                     ->description(__('admin.settings.sections.config_desc'))
-                    ->schema([
+                    ->components([
                         Grid::make(2)
-                            ->schema([
+                            ->components([
                                 Select::make('site_language')
                                     ->label(__('admin.settings.fields.language'))
                                     ->options([

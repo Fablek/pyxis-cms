@@ -1,9 +1,13 @@
 <x-filament-panels::page>
-    <x-filament-panels::form wire:submit="save">
+    <form wire:submit="save" class="space-y-6">
         {{ $this->form }}
 
-        <x-filament-panels::form.actions
-            :actions="$this->getFormActions()"
-        />
-    </x-filament-panels::form>
+        <div class="fi-form-actions">
+            <div class="flex flex-wrap items-center gap-3">
+                @foreach($this->getFormActions() as $action)
+                    {{ $action }}
+                @endforeach
+            </div>
+        </div>
+    </form>
 </x-filament-panels::page>

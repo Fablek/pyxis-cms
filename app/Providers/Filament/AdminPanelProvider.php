@@ -60,6 +60,7 @@ class AdminPanelProvider extends PanelProvider
                 Authenticate::class,
             ])
             ->viteTheme('resources/css/filament/admin/theme.css')
+            // ->spa()
             ->topbar(false)
             ->sidebarCollapsibleOnDesktop()
             ->navigationGroups([
@@ -68,11 +69,24 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->renderHook(
                 'panels::page.start',
-                fn (): string => Blade::render('<x-filament-custom-header />'),
-            )
-            ->renderHook(
-                'panels::sidebar.footer',
-                fn (): string => view('filament.sidebar-footer')->render(),
+                function (array $scopes): string {
+                    // Wyciągamy stronę, upewniając się, że to obiekt
+                    $page = $scopes['page'] ?? null;
+
+                    return Blade::render(
+                        '<x-filament-custom-header :heading="$heading" :header-actions="$headerActions" />',
+                        [
+                            // Najpierw sprawdzamy czy $page istnieje, potem czy ma metodę
+                            'heading' => ($page && method_exists($page, 'getHeading')) 
+                                ? $page->getHeading() 
+                                : ($page->heading ?? 'Pulpit'),
+
+                            'headerActions' => ($page && method_exists($page, 'getHeaderActions')) 
+                                ? $page->getHeaderActions() 
+                                : [],
+                        ]
+                    );
+                }
             )
             ->plugins([
                 CuratorPlugin::make()
@@ -80,7 +94,6 @@ class AdminPanelProvider extends PanelProvider
                     ->pluralLabel('Biblioteka mediów')
                     ->navigationIcon('heroicon-o-photo')
                     ->registerNavigation(true)
-                    ->defaultListView('grid')
             ]);
     }
 
