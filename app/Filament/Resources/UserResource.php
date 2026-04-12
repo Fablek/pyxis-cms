@@ -4,16 +4,22 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\UserResource\Pages;
 use App\Models\User;
-use Filament\Forms;
-use Filament\Forms\Form;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
-use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\BulkActionGroup;
 
 class UserResource extends Resource
 {
     protected static ?string $model = User::class;
-    protected static ?string $navigationIcon = 'heroicon-o-users';
+
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-users';
 
     public static function getNavigationLabel(): string
     {
@@ -30,23 +36,23 @@ class UserResource extends Resource
         return __('admin.users.plural_label');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Forms\Components\Section::make(__('admin.users.sections.basic_data'))
+        return $schema
+            ->components([
+                Section::make(__('admin.users.sections.basic_data'))
                     ->schema([
-                        Forms\Components\TextInput::make('name')
+                        TextInput::make('name')
                             ->label(__('admin.users.fields.name'))
                             ->required()
                             ->maxLength(255),
-                        Forms\Components\TextInput::make('email')
+                        TextInput::make('email')
                             ->label(__('admin.users.fields.email'))
                             ->email()
                             ->required()
                             ->unique(ignoreRecord: true)
                             ->maxLength(255),
-                        Forms\Components\Select::make('role_id')
+                        Select::make('role_id')
                             ->label(__('admin.users.fields.role'))
                             ->relationship('role', 'name')
                             ->getOptionLabelFromRecordUsing(fn ($record) => __('admin.roles.' . $record->slug))
@@ -55,9 +61,9 @@ class UserResource extends Resource
                             ->searchable(),
                     ])->columns(2),
 
-                Forms\Components\Section::make(__('admin.users.sections.security'))
+                Section::make(__('admin.users.sections.security'))
                     ->schema([
-                        Forms\Components\TextInput::make('password')
+                        TextInput::make('password')
                             ->label(__('admin.users.fields.password'))
                             ->password()
                             ->dehydrated(fn ($state) => filled($state))
@@ -71,37 +77,37 @@ class UserResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')
+                TextColumn::make('name')
                     ->label(__('admin.users.fields.name'))
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('email')
+                TextColumn::make('email')
                     ->label(__('admin.users.fields.email'))
                     ->searchable(),
-                Tables\Columns\TextColumn::make('role.name')
+                TextColumn::make('role.name')
                     ->label(__('admin.users.fields.role'))
                     ->badge()
                     ->formatStateUsing(fn (string $state, $record): string => 
-                        __('admin.roles.' . $record->role->slug) // Tłumaczymy na podstawie sluga
+                        __('admin.roles.' . $record->role->slug)
                     )
-                    ->color(fn (string $state, $record): string => match ($record->role->slug) {
+                    ->color(fn (string $state, $record): string => match ($record->role->slug ?? 'default') {
                         'admin' => 'danger',
                         'editor' => 'warning',
                         default => 'gray',
                     })
                     ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->label(__('admin.users.fields.created_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                EditAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
