@@ -54,6 +54,7 @@ return [
         'users' => 'Users',
         'settings' => 'Settings',
         'pages' => 'Pages',
+        'media' => 'Media',
     ],
     'users' => [
         'label' => 'User',
@@ -93,5 +94,10 @@ return [
         'placeholders' => [
             'select_page' => 'Select a page from the list...',
         ],
+    ],
+    'media' => [
+        'label' => 'Media',
+        'plural' => 'Media Library',
+        'nav_label' => 'Media Library',
     ],
 ];

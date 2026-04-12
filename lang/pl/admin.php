@@ -54,6 +54,7 @@ return [
         'users' => 'Użytkownicy',
         'settings' => 'Ustawienia',
         'pages' => 'Strony',
+        'media' => 'Media',
     ],
     'users' => [
         'label' => 'Użytkownik',
@@ -137,5 +138,10 @@ return [
         'placeholders' => [
             'select_page' => 'Wybierz stronę z listy...',
         ],
+    ],
+    'media' => [
+        'label' => 'Media',
+        'plural' => 'Biblioteka mediów',
+        'nav_label' => 'Biblioteka mediów',
     ],
 ];

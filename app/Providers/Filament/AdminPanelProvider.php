@@ -89,11 +89,11 @@ class AdminPanelProvider extends PanelProvider
                 }
             )
             ->plugins([
-                CuratorPlugin::make()
+                \Awcodes\Curator\CuratorPlugin::make()
                     ->label('Media')
                     ->pluralLabel('Biblioteka mediów')
                     ->navigationIcon('heroicon-o-photo')
-                    ->registerNavigation(true)
+                    ->registerNavigation(false) 
             ]);
     }
 
