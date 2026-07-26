@@ -2,12 +2,15 @@
 
 namespace App\Filament\Resources\FieldGroups\Schemas;
 
+use App\Models\Page;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Str;
 
@@ -27,7 +30,7 @@ class FieldGroupForm
                             ->label('Tytuł grupy')
                             ->required()
                             ->live(onBlur: true)
-                            ->afterStateUpdated(fn (string $operation, $state, $set) => $operation === 'create'
+                            ->afterStateUpdated(fn (string $operation, $state, Set $set) => $operation === 'create'
                                 ? $set('slug', Str::slug($state))
                                 : null
                             ),
@@ -53,7 +56,7 @@ class FieldGroupForm
                                         ->placeholder('np. Nagłówek sekcji')
                                         ->required()
                                         ->live(onBlur: true)
-                                        ->afterStateUpdated(fn ($state, $set) => $set('name', Str::snake($state))),
+                                        ->afterStateUpdated(fn ($state, Set $set) => $set('name', Str::snake($state))),
 
                                     TextInput::make('name')
                                         ->label('Nazwa systemowa (Name / klucza)')
@@ -92,10 +95,10 @@ class FieldGroupForm
                                     Select::make('param')
                                         ->label('Parametr')
                                         ->options([
-                                            'template' => 'Szablon strony (Template)',
-                                            'page_id' => 'Strona (Konkretne ID)',
+                                            'page_id' => 'Strona',
                                         ])
-                                        ->required(),
+                                        ->required()
+                                        ->default('page_id'),
 
                                     Select::make('operator')
                                         ->label('Operator')
@@ -106,13 +109,13 @@ class FieldGroupForm
                                         ->required()
                                         ->default('=='),
 
-                                    TextInput::make('value')
-                                        ->label('Wartość')
-                                        ->placeholder('np. contact, albo UUID strony')
-                                        ->required(),
+                                    Select::make('value')
+                                        ->label('Strona')
+                                        ->required()
+                                        ->searchable()
+                                        ->options(fn () => Page::pluck('title', 'id')->toArray()),
                                 ])->columns(3),
                         ]),
-
                 ])->columnSpan([
                     'sm' => 1,
                     'lg' => 2,

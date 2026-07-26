@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\FieldGroups\Pages;
 
 use App\Filament\Resources\FieldGroups\FieldGroupResource;
-use Filament\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateFieldGroup extends CreateRecord
@@ -13,22 +12,14 @@ class CreateFieldGroup extends CreateRecord
     public function getHeaderActions(): array
     {
         return [
-            Action::make('create')
-                ->label(__('filament-panels::resources/pages/create-record.form.actions.create.label'))
+            $this->getCreateFormAction()
+                ->formId('form')
                 ->color('primary')
-                ->action('create')
                 ->keyBindings(['mod+s']),
 
-            Action::make('createAnother')
-                ->label(__('filament-panels::resources/pages/create-record.form.actions.create_another.label'))
-                ->color('gray')
-                ->action('createAnother')
-                ->keyBindings(['mod+shift+s']),
+            $this->getCreateAnotherFormAction(),
 
-            Action::make('cancel')
-                ->label(__('filament-panels::resources/pages/create-record.form.actions.cancel.label'))
-                ->color('gray')
-                ->url($this->getResource()::getUrl('index')),
+            $this->getCancelFormAction(),
         ];
     }
 
