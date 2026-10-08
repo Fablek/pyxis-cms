@@ -17,6 +17,7 @@
         "tailwindcss-development",
         "filament-pro",
         "laravel-specialist",
-        "php-pro"
+        "php-pro",
+        "pyxis-docs"
     ]
 }
