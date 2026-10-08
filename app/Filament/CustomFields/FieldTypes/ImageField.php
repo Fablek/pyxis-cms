@@ -15,7 +15,7 @@ class ImageField extends FieldType
 
     public function label(): string
     {
-        return 'Obraz';
+        return __('admin.custom_fields.types.image');
     }
 
     public function icon(): Heroicon

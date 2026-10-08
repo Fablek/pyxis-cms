@@ -17,7 +17,7 @@ class PageLinkField extends FieldType
 
     public function label(): string
     {
-        return 'Strona (relacja)';
+        return __('admin.custom_fields.types.page');
     }
 
     public function icon(): Heroicon
@@ -29,7 +29,7 @@ class PageLinkField extends FieldType
     {
         return [
             Toggle::make('multiple')
-                ->label('Wiele stron'),
+                ->label(__('admin.custom_fields.settings.multiple_pages')),
         ];
     }
 

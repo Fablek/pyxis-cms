@@ -36,10 +36,10 @@ class FieldDefinitionForm
                     ->contained(false)
                     ->extraAttributes(['class' => 'pyxis-tabs'])
                     ->tabs([
-                        Tab::make('Ogólne')
+                        Tab::make(__('admin.custom_fields.tabs.general'))
                             ->schema(fn (Get $get): array => [
                                 Select::make('type')
-                                    ->label('Typ pola')
+                                    ->label(__('admin.custom_fields.definition.type'))
                                     ->options($registry->options($depth))
                                     ->default('text')
                                     ->required()
@@ -47,8 +47,8 @@ class FieldDefinitionForm
                                     ->selectablePlaceholder(false),
 
                                 TextInput::make('label')
-                                    ->label('Etykieta')
-                                    ->placeholder('np. Nagłówek sekcji')
+                                    ->label(__('admin.custom_fields.definition.label'))
+                                    ->placeholder(__('admin.custom_fields.definition.label_placeholder'))
                                     ->required()
                                     ->live(onBlur: true)
                                     ->afterStateUpdated(function (?string $state, Get $get, Set $set): void {
@@ -58,24 +58,24 @@ class FieldDefinitionForm
                                     }),
 
                                 TextInput::make('name')
-                                    ->label('Nazwa systemowa')
-                                    ->placeholder('np. naglowek_sekcji')
-                                    ->helperText('Klucz w API. Zmiana odetnie zapisane wartości.')
+                                    ->label(__('admin.custom_fields.definition.name'))
+                                    ->placeholder(__('admin.custom_fields.definition.name_placeholder'))
+                                    ->helperText(__('admin.custom_fields.definition.name_help'))
                                     ->required()
                                     ->live(onBlur: true)
                                     ->regex('/^[a-z][a-z0-9_]*$/')
                                     ->validationMessages([
-                                        'regex' => 'Nazwa musi zaczynać się od litery i może zawierać tylko małe litery, cyfry i podkreślenia.',
+                                        'regex' => __('admin.custom_fields.definition.name_regex'),
                                     ]),
 
                                 ...self::typeOf($get)->generalSettings($depth),
                             ])
                             ->columns(['default' => 1, 'md' => 2]),
 
-                        Tab::make('Walidacja')
+                        Tab::make(__('admin.custom_fields.tabs.validation'))
                             ->schema(fn (Get $get): array => [
                                 Toggle::make('required')
-                                    ->label('Pole wymagane')
+                                    ->label(__('admin.custom_fields.definition.required'))
                                     ->visible(self::typeOf($get)->supportsRequired())
                                     ->columnSpanFull(),
 
@@ -85,15 +85,15 @@ class FieldDefinitionForm
                                 || self::typeOf($get)->validationSettings() !== [])
                             ->columns(['default' => 1, 'md' => 2]),
 
-                        Tab::make('Prezentacja')
+                        Tab::make(__('admin.custom_fields.tabs.presentation'))
                             ->schema(fn (Get $get): array => [
                                 Textarea::make('instructions')
-                                    ->label('Instrukcja dla redaktora')
+                                    ->label(__('admin.custom_fields.definition.instructions'))
                                     ->rows(2)
                                     ->columnSpanFull(),
 
                                 Select::make('width')
-                                    ->label('Szerokość w formularzu')
+                                    ->label(__('admin.custom_fields.definition.width'))
                                     ->options([
                                         'full' => '100%',
                                         'three_quarters' => '75%',
@@ -124,7 +124,7 @@ class FieldDefinitionForm
             ->expandAllAction(fn (Action $action): Action => $action->hidden())
             ->cloneable()
             ->reorderable()
-            ->addActionLabel('Dodaj pole')
+            ->addActionLabel(__('admin.custom_fields.definition.add'))
             ->addActionAlignment(Alignment::End)
             ->defaultItems(0)
             ->rules([self::uniqueNamesRule()]);
@@ -150,7 +150,7 @@ class FieldDefinitionForm
                 ->unique();
 
             if ($duplicates->isNotEmpty()) {
-                $fail('Nazwy pól muszą być unikalne. Powtórzone: '.$duplicates->implode(', ').'.');
+                $fail(__('admin.custom_fields.definition.unique_names', ['names' => $duplicates->implode(', ')]));
             }
         };
     }

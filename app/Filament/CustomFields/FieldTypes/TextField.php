@@ -15,7 +15,7 @@ class TextField extends FieldType
 
     public function label(): string
     {
-        return 'Tekst';
+        return __('admin.custom_fields.types.text');
     }
 
     public function icon(): Heroicon
@@ -27,7 +27,7 @@ class TextField extends FieldType
     {
         return [
             TextInput::make('default_value')
-                ->label('Wartość domyślna'),
+                ->label(__('admin.custom_fields.settings.default_value')),
         ];
     }
 
@@ -35,7 +35,7 @@ class TextField extends FieldType
     {
         return [
             TextInput::make('max_length')
-                ->label('Maksymalna liczba znaków')
+                ->label(__('admin.custom_fields.settings.max_length'))
                 ->numeric()
                 ->minValue(1),
         ];
@@ -45,7 +45,7 @@ class TextField extends FieldType
     {
         return [
             TextInput::make('placeholder')
-                ->label('Placeholder'),
+                ->label(__('admin.custom_fields.settings.placeholder')),
         ];
     }
 

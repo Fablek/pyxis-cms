@@ -18,16 +18,21 @@ class FieldGroupsTable
                 TextColumn::make('id')
                     ->label('ID'),
                 TextColumn::make('title')
+                    ->label(__('admin.field_groups.fields.title'))
                     ->searchable(),
                 TextColumn::make('slug')
+                    ->label(__('admin.field_groups.fields.slug'))
                     ->searchable(),
                 IconColumn::make('is_active')
+                    ->label(__('admin.field_groups.fields.is_active'))
                     ->boolean(),
                 TextColumn::make('created_at')
+                    ->label(__('admin.field_groups.fields.created_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
+                    ->label(__('admin.field_groups.fields.updated_at_column'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),

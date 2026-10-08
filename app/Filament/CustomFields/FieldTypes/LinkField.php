@@ -17,7 +17,7 @@ class LinkField extends FieldType
 
     public function label(): string
     {
-        return 'Link';
+        return __('admin.custom_fields.types.link');
     }
 
     public function icon(): Heroicon
@@ -34,15 +34,15 @@ class LinkField extends FieldType
             ->columns(['default' => 1, 'md' => 2])
             ->schema([
                 TextInput::make('url')
-                    ->label('Adres URL')
-                    ->placeholder('https:// lub /sciezka')
+                    ->label(__('admin.custom_fields.link.url'))
+                    ->placeholder(__('admin.custom_fields.link.url_placeholder'))
                     ->required($isRequired),
 
                 TextInput::make('title')
-                    ->label('Tekst linku'),
+                    ->label(__('admin.custom_fields.link.title')),
 
                 Toggle::make('new_tab')
-                    ->label('Otwórz w nowej karcie'),
+                    ->label(__('admin.custom_fields.link.new_tab')),
             ]);
     }
 }

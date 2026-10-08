@@ -19,19 +19,19 @@ class PreviewFieldsAction
     public static function make(): Action
     {
         return Action::make('previewFields')
-            ->label('Podgląd formularza')
+            ->label(__('admin.field_groups.preview.label'))
             ->icon(Heroicon::OutlinedEye)
             ->color('gray')
-            ->modalHeading('Podgląd formularza')
-            ->modalDescription('Tak redaktor zobaczy te pola podczas edycji strony. Wartości nie są zapisywane.')
+            ->modalHeading(__('admin.field_groups.preview.label'))
+            ->modalDescription(__('admin.field_groups.preview.description'))
             ->modalWidth(Width::FourExtraLarge)
             ->modalSubmitAction(false)
-            ->modalCancelActionLabel('Zamknij')
+            ->modalCancelActionLabel(__('admin.field_groups.preview.close'))
             ->schema(function (CreateRecord|EditRecord $livewire): array {
                 $components = app(FieldTypeRegistry::class)->formComponents($livewire->data['fields'] ?? []);
 
                 if ($components === []) {
-                    return [Text::make('Brak pól do wyświetlenia. Dodaj pole i uzupełnij jego nazwę.')];
+                    return [Text::make(__('admin.field_groups.preview.empty'))];
                 }
 
                 return [

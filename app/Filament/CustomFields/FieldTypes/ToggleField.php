@@ -15,7 +15,7 @@ class ToggleField extends FieldType
 
     public function label(): string
     {
-        return 'Przełącznik';
+        return __('admin.custom_fields.types.toggle');
     }
 
     public function icon(): Heroicon
@@ -32,7 +32,7 @@ class ToggleField extends FieldType
     {
         return [
             Toggle::make('default_value')
-                ->label('Domyślnie włączony'),
+                ->label(__('admin.custom_fields.settings.default_on')),
         ];
     }
 

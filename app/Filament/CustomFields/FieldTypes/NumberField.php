@@ -15,7 +15,7 @@ class NumberField extends FieldType
 
     public function label(): string
     {
-        return 'Liczba';
+        return __('admin.custom_fields.types.number');
     }
 
     public function icon(): Heroicon
@@ -27,15 +27,15 @@ class NumberField extends FieldType
     {
         return [
             TextInput::make('min')
-                ->label('Minimum')
+                ->label(__('admin.custom_fields.settings.min'))
                 ->numeric(),
 
             TextInput::make('max')
-                ->label('Maksimum')
+                ->label(__('admin.custom_fields.settings.max'))
                 ->numeric(),
 
             TextInput::make('step')
-                ->label('Krok')
+                ->label(__('admin.custom_fields.settings.step'))
                 ->numeric(),
         ];
     }
@@ -44,8 +44,8 @@ class NumberField extends FieldType
     {
         return [
             TextInput::make('suffix')
-                ->label('Jednostka (sufiks)')
-                ->placeholder('np. zł, %, px'),
+                ->label(__('admin.custom_fields.settings.suffix'))
+                ->placeholder(__('admin.custom_fields.settings.suffix_placeholder')),
         ];
     }
 

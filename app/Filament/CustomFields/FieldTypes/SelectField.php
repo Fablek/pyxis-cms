@@ -19,7 +19,7 @@ class SelectField extends FieldType
 
     public function label(): string
     {
-        return 'Lista wyboru';
+        return __('admin.custom_fields.types.select');
     }
 
     public function icon(): Heroicon
@@ -31,23 +31,23 @@ class SelectField extends FieldType
     {
         return [
             Repeater::make('options')
-                ->label('Opcje')
+                ->label(__('admin.custom_fields.settings.options'))
                 ->table([
-                    TableColumn::make('Wartość')->markAsRequired(),
-                    TableColumn::make('Etykieta')->markAsRequired(),
+                    TableColumn::make(__('admin.custom_fields.settings.option_value'))->markAsRequired(),
+                    TableColumn::make(__('admin.custom_fields.settings.option_label'))->markAsRequired(),
                 ])
                 ->compact()
                 ->schema([
                     TextInput::make('value')->required(),
                     TextInput::make('label')->required(),
                 ])
-                ->addActionLabel('Dodaj opcję')
+                ->addActionLabel(__('admin.custom_fields.settings.add_option'))
                 ->reorderable()
                 ->defaultItems(1)
                 ->columnSpanFull(),
 
             Toggle::make('multiple')
-                ->label('Wielokrotny wybór'),
+                ->label(__('admin.custom_fields.settings.multiple')),
         ];
     }
 

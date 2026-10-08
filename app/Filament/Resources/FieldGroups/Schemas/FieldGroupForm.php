@@ -31,7 +31,7 @@ class FieldGroupForm
                 Group::make([
                     TextInput::make('title')
                         ->hiddenLabel()
-                        ->placeholder('Tytuł grupy pól')
+                        ->placeholder(__('admin.field_groups.fields.title_placeholder'))
                         ->required()
                         ->live(onBlur: true)
                         ->extraInputAttributes(['class' => 'text-lg font-medium'])
@@ -40,30 +40,30 @@ class FieldGroupForm
                             : null
                         ),
 
-                    Section::make('Pola')
+                    Section::make(__('admin.field_groups.sections.fields'))
                         ->afterHeader([
-                            Text::make(fn (Get $get): string => self::fieldsCountLabel(count($get('fields') ?? []))),
+                            Text::make(fn (Get $get): string => trans_choice('admin.field_groups.fields_count', count($get('fields') ?? []))),
                         ])
                         ->schema([
                             FieldDefinitionForm::make('fields'),
                         ]),
 
-                    Section::make('Reguły lokalizacji')
-                        ->description('Pokaż tę grupę pól, jeśli spełniony jest każdy z warunków.')
+                    Section::make(__('admin.field_groups.sections.location'))
+                        ->description(__('admin.field_groups.sections.location_desc'))
                         ->schema([
                             Repeater::make('rules')
                                 ->hiddenLabel()
                                 ->table([
-                                    TableColumn::make('Parametr'),
-                                    TableColumn::make('Operator')->width('200px'),
-                                    TableColumn::make('Wartość'),
+                                    TableColumn::make(__('admin.field_groups.location.param')),
+                                    TableColumn::make(__('admin.field_groups.location.operator'))->width('200px'),
+                                    TableColumn::make(__('admin.field_groups.location.value')),
                                 ])
                                 ->compact()
-                                ->addActionLabel('Dodaj warunek')
+                                ->addActionLabel(__('admin.field_groups.location.add'))
                                 ->schema([
                                     Select::make('param')
                                         ->options([
-                                            'page_id' => 'Strona',
+                                            'page_id' => __('admin.field_groups.location.params.page_id'),
                                         ])
                                         ->required()
                                         ->default('page_id')
@@ -71,8 +71,8 @@ class FieldGroupForm
 
                                     Select::make('operator')
                                         ->options([
-                                            '==' => 'jest równa',
-                                            '!=' => 'nie jest równa',
+                                            '==' => __('admin.field_groups.location.operators.equals'),
+                                            '!=' => __('admin.field_groups.location.operators.not_equals'),
                                         ])
                                         ->required()
                                         ->default('==')
@@ -90,19 +90,19 @@ class FieldGroupForm
                 ]),
 
                 Group::make([
-                    Section::make('Status')->schema([
+                    Section::make(__('admin.field_groups.sections.status'))->schema([
                         Toggle::make('is_active')
-                            ->label('Aktywna (widoczna)')
-                            ->helperText('Nieaktywna grupa nie pojawia się w formularzach stron.')
+                            ->label(__('admin.field_groups.fields.is_active'))
+                            ->helperText(__('admin.field_groups.fields.is_active_help'))
                             ->default(true),
 
-                        Text::make(fn (?FieldGroup $record): string => 'Ostatnia zmiana: '.$record?->updated_at?->diffForHumans())
+                        Text::make(fn (?FieldGroup $record): string => __('admin.field_groups.fields.updated_at', ['time' => $record?->updated_at?->diffForHumans()]))
                             ->visible(fn (?FieldGroup $record): bool => $record !== null),
                     ]),
 
-                    Section::make('Ustawienia grupy')->schema([
+                    Section::make(__('admin.field_groups.sections.settings'))->schema([
                         TextInput::make('slug')
-                            ->label('Slug')
+                            ->label(__('admin.field_groups.fields.slug'))
                             ->required()
                             ->unique(ignoreRecord: true),
                     ]),
@@ -111,14 +111,5 @@ class FieldGroupForm
                     'lg' => 1,
                 ]),
             ]);
-    }
-
-    protected static function fieldsCountLabel(int $count): string
-    {
-        return match (true) {
-            $count === 1 => '1 pole',
-            $count % 10 >= 2 && $count % 10 <= 4 && ($count % 100 < 10 || $count % 100 >= 20) => "{$count} pola",
-            default => "{$count} pól",
-        };
     }
 }

@@ -18,7 +18,7 @@ class RepeaterField extends FieldType
 
     public function label(): string
     {
-        return 'Repeater (lista)';
+        return __('admin.custom_fields.types.repeater');
     }
 
     public function icon(): Heroicon
@@ -35,7 +35,7 @@ class RepeaterField extends FieldType
     {
         return [
             FieldDefinitionForm::make('sub_fields', $depth + 1)
-                ->label('Pola podrzędne')
+                ->label(__('admin.custom_fields.definition.sub_fields'))
                 ->columnSpanFull(),
         ];
     }
@@ -44,12 +44,12 @@ class RepeaterField extends FieldType
     {
         return [
             TextInput::make('min_items')
-                ->label('Minimalna liczba elementów')
+                ->label(__('admin.custom_fields.settings.min_items'))
                 ->numeric()
                 ->minValue(0),
 
             TextInput::make('max_items')
-                ->label('Maksymalna liczba elementów')
+                ->label(__('admin.custom_fields.settings.max_items'))
                 ->numeric()
                 ->minValue(1),
         ];
@@ -59,8 +59,8 @@ class RepeaterField extends FieldType
     {
         return [
             TextInput::make('button_label')
-                ->label('Tekst przycisku dodawania')
-                ->placeholder('Dodaj element'),
+                ->label(__('admin.custom_fields.settings.button_label'))
+                ->placeholder(__('admin.custom_fields.settings.add_item')),
         ];
     }
 
@@ -71,7 +71,7 @@ class RepeaterField extends FieldType
             ->columns(['default' => 1, 'lg' => 12])
             ->minItems(filled($config['min_items'] ?? null) ? (int) $config['min_items'] : null)
             ->maxItems(filled($config['max_items'] ?? null) ? (int) $config['max_items'] : null)
-            ->addActionLabel(filled($config['button_label'] ?? null) ? $config['button_label'] : 'Dodaj element')
+            ->addActionLabel(filled($config['button_label'] ?? null) ? $config['button_label'] : __('admin.custom_fields.settings.add_item'))
             ->collapsible();
     }
 }

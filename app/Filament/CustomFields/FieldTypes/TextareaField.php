@@ -16,7 +16,7 @@ class TextareaField extends FieldType
 
     public function label(): string
     {
-        return 'Obszar tekstowy';
+        return __('admin.custom_fields.types.textarea');
     }
 
     public function icon(): Heroicon
@@ -28,7 +28,7 @@ class TextareaField extends FieldType
     {
         return [
             TextInput::make('max_length')
-                ->label('Maksymalna liczba znaków')
+                ->label(__('admin.custom_fields.settings.max_length'))
                 ->numeric()
                 ->minValue(1),
         ];
@@ -38,10 +38,10 @@ class TextareaField extends FieldType
     {
         return [
             TextInput::make('placeholder')
-                ->label('Placeholder'),
+                ->label(__('admin.custom_fields.settings.placeholder')),
 
             TextInput::make('rows')
-                ->label('Liczba wierszy')
+                ->label(__('admin.custom_fields.settings.rows'))
                 ->numeric()
                 ->minValue(1)
                 ->default(4),

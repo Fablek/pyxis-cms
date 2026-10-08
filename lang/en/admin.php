@@ -1,4 +1,5 @@
 <?php
+
 return [
     'pages' => [
         'label' => 'Page',
@@ -80,17 +81,17 @@ return [
         'title' => 'System Settings',
         'save_button' => 'Save changes',
         'notification_success' => 'Settings have been successfully saved.',
-        
+
         'sections' => [
             'config' => 'Main Configuration',
             'config_desc' => 'Manage core site parameters, such as the default language and the homepage.',
         ],
-        
+
         'fields' => [
             'language' => 'Site Language',
             'homepage' => 'Main Homepage',
         ],
-        
+
         'placeholders' => [
             'select_page' => 'Select a page from the list...',
         ],
@@ -99,5 +100,114 @@ return [
         'label' => 'Media',
         'plural' => 'Media Library',
         'nav_label' => 'Media Library',
+    ],
+
+    'field_groups' => [
+        'label' => 'Field group',
+        'plural_label' => 'Field groups',
+        'nav_label' => 'Field groups',
+        'fields_count' => ':count field|:count fields',
+        'sections' => [
+            'fields' => 'Fields',
+            'location' => 'Location rules',
+            'location_desc' => 'Show this field group if all of the conditions are met.',
+            'status' => 'Status',
+            'settings' => 'Group settings',
+        ],
+        'fields' => [
+            'title' => 'Title',
+            'title_placeholder' => 'Field group title',
+            'slug' => 'Slug',
+            'is_active' => 'Active (visible)',
+            'is_active_help' => 'An inactive group does not appear in page forms.',
+            'updated_at' => 'Last modified: :time',
+            'created_at' => 'Created at',
+            'updated_at_column' => 'Updated at',
+        ],
+        'location' => [
+            'param' => 'Parameter',
+            'operator' => 'Operator',
+            'value' => 'Value',
+            'add' => 'Add condition',
+            'params' => [
+                'page_id' => 'Page',
+            ],
+            'operators' => [
+                'equals' => 'is equal to',
+                'not_equals' => 'is not equal to',
+            ],
+        ],
+        'preview' => [
+            'label' => 'Form preview',
+            'description' => 'This is how editors will see these fields while editing a page. Values are not saved.',
+            'close' => 'Close',
+            'empty' => 'No fields to display. Add a field and fill in its name.',
+        ],
+    ],
+    'custom_fields' => [
+        'tabs' => [
+            'general' => 'General',
+            'validation' => 'Validation',
+            'presentation' => 'Presentation',
+        ],
+        'definition' => [
+            'type' => 'Field type',
+            'label' => 'Label',
+            'label_placeholder' => 'e.g. Section heading',
+            'name' => 'System name',
+            'name_placeholder' => 'e.g. section_heading',
+            'name_help' => 'The key used in the API. Changing it disconnects saved values.',
+            'name_regex' => 'The name must start with a letter and may only contain lowercase letters, digits and underscores.',
+            'required' => 'Required field',
+            'instructions' => 'Instructions for editors',
+            'width' => 'Width in the form',
+            'add' => 'Add field',
+            'new_field' => 'New field',
+            'sub_fields' => 'Sub fields',
+            'unique_names' => 'Field names must be unique. Duplicated: :names.',
+        ],
+        'types' => [
+            'text' => 'Text',
+            'textarea' => 'Text area',
+            'number' => 'Number',
+            'wysiwyg' => 'WYSIWYG editor',
+            'image' => 'Image',
+            'gallery' => 'Gallery',
+            'select' => 'Select',
+            'toggle' => 'Toggle',
+            'link' => 'Link',
+            'page' => 'Page (relation)',
+            'repeater' => 'Repeater (list)',
+            'group' => 'Group',
+        ],
+        'settings' => [
+            'default_value' => 'Default value',
+            'default_on' => 'On by default',
+            'max_length' => 'Maximum length',
+            'placeholder' => 'Placeholder',
+            'rows' => 'Rows',
+            'min' => 'Minimum',
+            'max' => 'Maximum',
+            'step' => 'Step',
+            'suffix' => 'Unit (suffix)',
+            'suffix_placeholder' => 'e.g. $, %, px',
+            'max_images' => 'Maximum number of images',
+            'options' => 'Options',
+            'option_value' => 'Value',
+            'option_label' => 'Label',
+            'add_option' => 'Add option',
+            'multiple' => 'Allow multiple',
+            'multiple_pages' => 'Multiple pages',
+            'min_items' => 'Minimum items',
+            'max_items' => 'Maximum items',
+            'button_label' => 'Add button text',
+            'add_item' => 'Add item',
+        ],
+        'link' => [
+            'url' => 'URL',
+            'url_placeholder' => 'https:// or /path',
+            'title' => 'Link text',
+            'new_tab' => 'Open in a new tab',
+        ],
     ],
 ];

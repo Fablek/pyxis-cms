@@ -22,6 +22,21 @@ class FieldGroupResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'title';
 
+    public static function getNavigationLabel(): string
+    {
+        return __('admin.field_groups.nav_label');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('admin.field_groups.label');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('admin.field_groups.plural_label');
+    }
+
     public static function form(Schema $schema): Schema
     {
         return FieldGroupForm::configure($schema);

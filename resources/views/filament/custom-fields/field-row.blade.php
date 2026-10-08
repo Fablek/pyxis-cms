@@ -2,7 +2,7 @@
     <span class="pyxis-field-number" aria-hidden="true"></span>
 
     <span class="truncate">
-        {{ filled($label) ? $label : 'Nowe pole' }}
+        {{ filled($label) ? $label : __('admin.custom_fields.definition.new_field') }}
         @if ($isRequired)
             <span class="text-danger-600 dark:text-danger-400">*</span>
         @endif

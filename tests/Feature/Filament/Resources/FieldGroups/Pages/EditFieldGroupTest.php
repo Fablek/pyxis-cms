@@ -99,3 +99,21 @@ it('does not offer nested field types beyond the maximum depth', function () {
         ->and($registry->options(FieldTypeRegistry::MAX_DEPTH))->not->toHaveKey('group')
         ->and($registry->options(FieldTypeRegistry::MAX_DEPTH))->toHaveKey('text');
 });
+
+it('renders the field group editor without missing translations', function (string $locale, string $expectedText) {
+    app()->setLocale($locale);
+
+    $group = FieldGroup::factory()->create([
+        'fields' => [
+            ['type' => 'repeater', 'label' => 'FAQ', 'name' => 'faq', 'sub_fields' => [textField('question')]],
+        ],
+    ]);
+
+    Livewire::test(EditFieldGroup::class, ['record' => $group->getRouteKey()])
+        ->assertSee($expectedText)
+        ->assertDontSee('admin.field_groups')
+        ->assertDontSee('admin.custom_fields');
+})->with([
+    'polish' => ['pl', 'Reguły lokalizacji'],
+    'english' => ['en', 'Location rules'],
+]);

@@ -15,7 +15,7 @@ class WysiwygField extends FieldType
 
     public function label(): string
     {
-        return 'Edytor WYSIWYG';
+        return __('admin.custom_fields.types.wysiwyg');
     }
 
     public function icon(): Heroicon

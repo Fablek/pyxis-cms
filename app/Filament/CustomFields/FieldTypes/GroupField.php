@@ -17,7 +17,7 @@ class GroupField extends FieldType
 
     public function label(): string
     {
-        return 'Grupa';
+        return __('admin.custom_fields.types.group');
     }
 
     public function icon(): Heroicon
@@ -39,7 +39,7 @@ class GroupField extends FieldType
     {
         return [
             FieldDefinitionForm::make('sub_fields', $depth + 1)
-                ->label('Pola podrzędne')
+                ->label(__('admin.custom_fields.definition.sub_fields'))
                 ->columnSpanFull(),
         ];
     }

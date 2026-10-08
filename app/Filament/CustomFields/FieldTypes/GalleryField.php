@@ -16,7 +16,7 @@ class GalleryField extends FieldType
 
     public function label(): string
     {
-        return 'Galeria';
+        return __('admin.custom_fields.types.gallery');
     }
 
     public function icon(): Heroicon
@@ -28,7 +28,7 @@ class GalleryField extends FieldType
     {
         return [
             TextInput::make('max_items')
-                ->label('Maksymalna liczba obrazów')
+                ->label(__('admin.custom_fields.settings.max_images'))
                 ->numeric()
                 ->minValue(1),
         ];
