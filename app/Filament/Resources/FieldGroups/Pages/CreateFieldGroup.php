@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\FieldGroups\Pages;
 
+use App\Filament\Resources\FieldGroups\Actions\PreviewFieldsAction;
 use App\Filament\Resources\FieldGroups\FieldGroupResource;
 use Filament\Resources\Pages\CreateRecord;
 
@@ -12,6 +13,8 @@ class CreateFieldGroup extends CreateRecord
     public function getHeaderActions(): array
     {
         return [
+            PreviewFieldsAction::make(),
+
             $this->getCreateFormAction()
                 ->formId('form')
                 ->color('primary')

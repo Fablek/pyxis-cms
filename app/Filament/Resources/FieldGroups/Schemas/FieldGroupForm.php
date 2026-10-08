@@ -2,13 +2,17 @@
 
 namespace App\Filament\Resources\FieldGroups\Schemas;
 
+use App\Filament\CustomFields\FieldDefinitionForm;
+use App\Models\FieldGroup;
 use App\Models\Page;
 use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Repeater\TableColumn;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Text;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
@@ -25,96 +29,60 @@ class FieldGroupForm
             ])
             ->components([
                 Group::make([
-                    Section::make('Podstawowe informacje')->schema([
-                        TextInput::make('title')
-                            ->label('Tytuł grupy')
-                            ->required()
-                            ->live(onBlur: true)
-                            ->afterStateUpdated(fn (string $operation, $state, Set $set) => $operation === 'create'
-                                ? $set('slug', Str::slug($state))
-                                : null
-                            ),
+                    TextInput::make('title')
+                        ->hiddenLabel()
+                        ->placeholder('Tytuł grupy pól')
+                        ->required()
+                        ->live(onBlur: true)
+                        ->extraInputAttributes(['class' => 'text-lg font-medium'])
+                        ->afterStateUpdated(fn (string $operation, $state, Set $set) => $operation === 'create'
+                            ? $set('slug', Str::slug($state))
+                            : null
+                        ),
 
-                        TextInput::make('slug')
-                            ->label('Slug')
-                            ->required()
-                            ->unique(ignoreRecord: true),
-                    ])->columns(2),
-
-                    Section::make('Definicje Pól')
-                        ->description('Zdefiniuj pola, które pojawią się w formularzu edycji strony.')
+                    Section::make('Pola')
+                        ->afterHeader([
+                            Text::make(fn (Get $get): string => self::fieldsCountLabel(count($get('fields') ?? []))),
+                        ])
                         ->schema([
-                            Repeater::make('fields')
-                                ->label('')
-                                ->addActionLabel('Dodaj nowe pole')
-                                ->collapsible()
-                                ->reorderable()
-                                ->itemLabel(fn (array $state): ?string => $state['label'] ?? 'Nowe pole')
-                                ->schema([
-                                    TextInput::make('label')
-                                        ->label('Etykieta (Label)')
-                                        ->placeholder('np. Nagłówek sekcji')
-                                        ->required()
-                                        ->live(onBlur: true)
-                                        ->afterStateUpdated(fn ($state, Set $set) => $set('name', Str::snake($state))),
-
-                                    TextInput::make('name')
-                                        ->label('Nazwa systemowa (Name / klucza)')
-                                        ->placeholder('np. naglowek_sekcji')
-                                        ->required()
-                                        ->regex('/^[a-z0-9_]+$/')
-                                        ->validationMessages([
-                                            'regex' => 'Nazwa może zawierać tylko małe litery, cyfry i podkreślenia.',
-                                        ]),
-
-                                    Select::make('type')
-                                        ->label('Typ pola')
-                                        ->options([
-                                            'text' => 'Tekst (Text)',
-                                            'textarea' => 'Pole tekstowe (Textarea)',
-                                            'wysiwyg' => 'Edytor WYSIWYG',
-                                            'media' => 'Obraz / Media',
-                                            'toggle' => 'Przełącznik (Tak/Nie)',
-                                        ])
-                                        ->required()
-                                        ->default('text'),
-
-                                    Toggle::make('is_required')
-                                        ->label('Wymagane?')
-                                        ->default(false),
-                                ])->columns(2),
+                            FieldDefinitionForm::make('fields'),
                         ]),
 
-                    Section::make('Warunki wyświetlania (Location Rules)')
-                        ->description('Określ, gdzie ta grupa pól ma być dostępna.')
+                    Section::make('Reguły lokalizacji')
+                        ->description('Pokaż tę grupę pól, jeśli spełniony jest każdy z warunków.')
                         ->schema([
                             Repeater::make('rules')
-                                ->label('')
+                                ->hiddenLabel()
+                                ->table([
+                                    TableColumn::make('Parametr'),
+                                    TableColumn::make('Operator')->width('200px'),
+                                    TableColumn::make('Wartość'),
+                                ])
+                                ->compact()
                                 ->addActionLabel('Dodaj warunek')
                                 ->schema([
                                     Select::make('param')
-                                        ->label('Parametr')
                                         ->options([
                                             'page_id' => 'Strona',
                                         ])
                                         ->required()
-                                        ->default('page_id'),
+                                        ->default('page_id')
+                                        ->selectablePlaceholder(false),
 
                                     Select::make('operator')
-                                        ->label('Operator')
                                         ->options([
-                                            '==' => 'równa się (==)',
-                                            '!=' => 'nie równa się (!=)',
+                                            '==' => 'jest równa',
+                                            '!=' => 'nie jest równa',
                                         ])
                                         ->required()
-                                        ->default('=='),
+                                        ->default('==')
+                                        ->selectablePlaceholder(false),
 
                                     Select::make('value')
-                                        ->label('Strona')
                                         ->required()
                                         ->searchable()
                                         ->options(fn () => Page::pluck('title', 'id')->toArray()),
-                                ])->columns(3),
+                                ]),
                         ]),
                 ])->columnSpan([
                     'sm' => 1,
@@ -125,12 +93,32 @@ class FieldGroupForm
                     Section::make('Status')->schema([
                         Toggle::make('is_active')
                             ->label('Aktywna (widoczna)')
+                            ->helperText('Nieaktywna grupa nie pojawia się w formularzach stron.')
                             ->default(true),
+
+                        Text::make(fn (?FieldGroup $record): string => 'Ostatnia zmiana: '.$record?->updated_at?->diffForHumans())
+                            ->visible(fn (?FieldGroup $record): bool => $record !== null),
+                    ]),
+
+                    Section::make('Ustawienia grupy')->schema([
+                        TextInput::make('slug')
+                            ->label('Slug')
+                            ->required()
+                            ->unique(ignoreRecord: true),
                     ]),
                 ])->columnSpan([
                     'sm' => 1,
                     'lg' => 1,
                 ]),
             ]);
+    }
+
+    protected static function fieldsCountLabel(int $count): string
+    {
+        return match (true) {
+            $count === 1 => '1 pole',
+            $count % 10 >= 2 && $count % 10 <= 4 && ($count % 100 < 10 || $count % 100 >= 20) => "{$count} pola",
+            default => "{$count} pól",
+        };
     }
 }

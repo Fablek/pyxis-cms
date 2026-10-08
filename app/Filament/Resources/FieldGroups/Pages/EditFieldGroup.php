@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\FieldGroups\Pages;
 
+use App\Filament\Resources\FieldGroups\Actions\PreviewFieldsAction;
 use App\Filament\Resources\FieldGroups\FieldGroupResource;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
@@ -13,6 +14,8 @@ class EditFieldGroup extends EditRecord
     public function getHeaderActions(): array
     {
         return [
+            PreviewFieldsAction::make(),
+
             $this->getSaveFormAction()
                 ->formId('form')
                 ->color('primary')

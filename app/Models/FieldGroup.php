@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
+use Database\Factories\FieldGroupFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class FieldGroup extends Model
 {
-    use HasUuids;
+    /** @use HasFactory<FieldGroupFactory> */
+    use HasFactory, HasUuids;
 
     protected $fillable = [
         'title',
