@@ -1,11 +1,10 @@
 <?php
 
-use App\Models\Page;
-use App\Models\Setting;
-use App\Models\Role;
-
 use App\Enums\PageStatus;
 use App\Enums\PageVisibility;
+use App\Models\Page;
+use App\Models\Role;
+use App\Models\Setting;
 
 it('returns the correct homepage based on global settings', function () {
     // Arrange
@@ -15,7 +14,7 @@ it('returns the correct homepage based on global settings', function () {
     // Make page. Factory will automatically create User and Role due to relationships.
     $homePage = Page::factory()->create([
         'title' => 'Witamy w Pyxis',
-        'slug' => 'home'
+        'slug' => 'home',
     ]);
 
     // Setup this page as main page
@@ -36,7 +35,7 @@ it('validates the hierarchical path correctly', function () {
     $child = Page::factory()->create([
         'title' => 'Nasz Zespół',
         'slug' => 'zespol',
-        'parent_id' => $parent->id
+        'parent_id' => $parent->id,
     ]);
 
     // Set lang (middeware need it)
@@ -125,4 +124,14 @@ it('returns 404 when homepage is requested but not set in settings', function ()
 
     $this->getJson('/api/pages')
         ->assertStatus(404);
+});
+it('returns 403 when the preview token is invalid', function () {
+    Page::factory()->create(['slug' => 'kontakt']);
+
+    $response = $this->getJson('/api/pages/kontakt', [
+        config('pyxis.preview.header') => 'not-a-valid-token',
+    ]);
+
+    $response->assertForbidden()
+        ->assertJsonPath('message', 'Invalid or malformed preview token.');
 });
