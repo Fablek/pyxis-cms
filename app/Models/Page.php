@@ -26,6 +26,8 @@ class Page extends Model
         'slug',
         'content',
         'content_draft',
+        'fields',
+        'fields_draft',
         'seo',
         'status',
         'visibility',
@@ -40,6 +42,8 @@ class Page extends Model
         'visibility' => PageVisibility::class,
         'content' => 'array',
         'content_draft' => 'array',
+        'fields' => 'array',
+        'fields_draft' => 'array',
         'seo' => 'array',
         'published_at' => 'datetime',
     ];

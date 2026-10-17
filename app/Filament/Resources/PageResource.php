@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Enums\PageStatus;
 use App\Enums\PageVisibility;
 use App\Filament\Resources\PageResource\Pages;
+use App\Filament\CustomFields\PageFieldsForm;
 use App\Models\Page;
 use App\Models\Setting;
 use App\Services\PageService;
@@ -101,6 +102,8 @@ class PageResource extends Resource
                             ->label(__('admin.pages.fields.content_draft'))
                             ->blocks([])
                             ->columnSpanFull(),
+
+                        PageFieldsForm::make(),
                     ])
                     ->columns(1)
                     ->columnSpan([
@@ -171,6 +174,7 @@ class PageResource extends Resource
 
                                         $record->update([
                                             'content' => $record->content_draft,
+                                            'fields' => $record->fields_draft,
                                             'status' => PageStatus::PUBLISHED,
                                         ]);
                                     
@@ -207,7 +211,7 @@ class PageResource extends Resource
                                             $record->delete();
                                             return redirect($livewire->getResource()::getUrl('index'));
                                         }),
-                            ]),
+                            ])->key('pageActions'),
                         ])
                         ->columns(1),
                     
