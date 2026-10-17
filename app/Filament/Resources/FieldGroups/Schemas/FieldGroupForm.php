@@ -2,10 +2,12 @@
 
 namespace App\Filament\Resources\FieldGroups\Schemas;
 
+use App\Enums\FieldGroupMode;
 use App\Filament\CustomFields\FieldDefinitionForm;
 use App\Models\FieldGroup;
 use App\Models\Page;
 use App\Services\FieldGroupLocator;
+use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Repeater\TableColumn;
 use Filament\Forms\Components\Select;
@@ -61,6 +63,19 @@ class FieldGroupForm
 
                 Group::make([
                     Section::make(__('admin.field_groups.sections.status'))->schema([
+                        Radio::make('mode')
+                            ->label(__('admin.field_groups.mode.label'))
+                            ->options([
+                                FieldGroupMode::STATIC->value => __('admin.field_groups.mode.static'),
+                                FieldGroupMode::BLOCK->value => __('admin.field_groups.mode.block'),
+                            ])
+                            ->descriptions([
+                                FieldGroupMode::STATIC->value => __('admin.field_groups.mode.static_help'),
+                                FieldGroupMode::BLOCK->value => __('admin.field_groups.mode.block_help'),
+                            ])
+                            ->default(FieldGroupMode::STATIC->value)
+                            ->required(),
+
                         Toggle::make('is_active')
                             ->label(__('admin.field_groups.fields.is_active'))
                             ->helperText(__('admin.field_groups.fields.is_active_help'))

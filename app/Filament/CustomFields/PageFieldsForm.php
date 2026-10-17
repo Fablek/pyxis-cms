@@ -2,6 +2,7 @@
 
 namespace App\Filament\CustomFields;
 
+use App\Enums\FieldGroupMode;
 use App\Models\FieldGroup;
 use App\Models\Page;
 use App\Services\FieldGroupLocator;
@@ -22,7 +23,7 @@ class PageFieldsForm
             ->statePath('fields_draft')
             ->columnSpanFull()
             ->schema(fn (Get $get, ?Page $record): array => app(FieldGroupLocator::class)
-                ->forPage(self::pageFromForm($get, $record))
+                ->forPage(self::pageFromForm($get, $record), FieldGroupMode::STATIC)
                 ->map(fn (FieldGroup $group): Section => Section::make($group->title)
                     ->statePath($group->slug)
                     ->columns(['default' => 1, 'lg' => 12])
@@ -33,7 +34,7 @@ class PageFieldsForm
     /**
      * The page as currently edited, so location rules react to unsaved changes (e.g. a new parent).
      */
-    protected static function pageFromForm(Get $get, ?Page $record): Page
+    public static function pageFromForm(Get $get, ?Page $record): Page
     {
         $page = $record ? clone $record : new Page;
         $page->parent_id = $get('parent_id');

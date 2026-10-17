@@ -39,6 +39,7 @@ return [
             'delete' => 'Delete Page',
             'create' => 'Create',
             'create_another' => 'Create and create another',
+            'add_block' => 'Add block',
         ],
         'modals' => [
             'delete_confirm' => 'Are you sure you want to delete this page?',
@@ -107,6 +108,13 @@ return [
         'plural_label' => 'Field groups',
         'nav_label' => 'Field groups',
         'fields_count' => ':count field|:count fields',
+        'mode' => [
+            'label' => 'Usage',
+            'static' => 'Static page fields',
+            'static_help' => 'A section with the fields is always shown in the form of matching pages.',
+            'block' => 'Content block',
+            'block_help' => 'Editors add the block to the page content any number of times, in any order.',
+        ],
         'sections' => [
             'fields' => 'Fields',
             'location' => 'Location rules',

@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\FieldGroupMode;
 use App\Models\FieldGroup;
 use App\Models\Page;
 use App\Models\Setting;
@@ -97,13 +98,16 @@ it('does not match unknown parameters or groups without rules', function () {
         ->and($locator->matches(groupWithRules([]), $page))->toBeFalse();
 });
 
-it('returns only active matching groups for a page', function () {
+it('returns only active matching groups of the given mode for a page', function () {
     $page = Page::factory()->create();
 
     $matching = groupWithRules([condition('page', $page->id)]);
     $inactive = groupWithRules([condition('page', $page->id)]);
     $inactive->update(['is_active' => false]);
+    $block = groupWithRules([condition('page', $page->id)]);
+    $block->update(['mode' => FieldGroupMode::BLOCK]);
     groupWithRules([condition('page', Page::factory()->create()->id)]);
 
-    expect(app(FieldGroupLocator::class)->forPage($page)->modelKeys())->toBe([$matching->id]);
+    expect(app(FieldGroupLocator::class)->forPage($page, FieldGroupMode::STATIC)->modelKeys())->toBe([$matching->id])
+        ->and(app(FieldGroupLocator::class)->forPage($page, FieldGroupMode::BLOCK)->modelKeys())->toBe([$block->id]);
 });

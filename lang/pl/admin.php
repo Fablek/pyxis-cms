@@ -39,6 +39,7 @@ return [
             'delete' => 'Usuń stronę',
             'create' => 'Utwórz',
             'create_another' => 'Utwórz i utwórz kolejny',
+            'add_block' => 'Dodaj blok',
         ],
         'modals' => [
             'delete_confirm' => 'Czy na pewno chcesz usunąć tę stronę?',
@@ -151,6 +152,13 @@ return [
         'plural_label' => 'Grupy pól',
         'nav_label' => 'Grupy pól',
         'fields_count' => ':count pole|:count pola|:count pól',
+        'mode' => [
+            'label' => 'Sposób użycia',
+            'static' => 'Stałe pola strony',
+            'static_help' => 'Sekcja z polami pojawia się na stałe w formularzu pasujących stron.',
+            'block' => 'Blok treści',
+            'block_help' => 'Redaktor dodaje blok do treści strony dowolną liczbę razy i w dowolnej kolejności.',
+        ],
         'sections' => [
             'fields' => 'Pola',
             'location' => 'Reguły lokalizacji',

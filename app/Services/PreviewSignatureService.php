@@ -2,9 +2,9 @@
 
 namespace App\Services;
 
-class PreviewSignatureService 
+class PreviewSignatureService
 {
-    public function verifySignature(string $path, int $expires, string $signature): bool 
+    public function verifySignature(string $path, int $expires, string $signature): bool
     {
         if ($expires < now()->timestamp) {
             return false;
@@ -15,8 +15,10 @@ class PreviewSignatureService
         return hash_equals($validSignature, $signature);
     }
 
-    public function generatePreviewToken(): string {
+    public function generatePreviewToken(): string
+    {
         $config = config('pyxis.preview');
+
         return encrypt($config['secret']);
     }
 }

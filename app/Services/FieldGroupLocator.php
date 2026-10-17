@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\FieldGroupMode;
 use App\Models\FieldGroup;
 use App\Models\Page;
 use App\Models\Setting;
@@ -38,10 +39,11 @@ class FieldGroupLocator
      *
      * @return Collection<int, FieldGroup>
      */
-    public function forPage(Page $page): Collection
+    public function forPage(Page $page, FieldGroupMode $mode): Collection
     {
         return FieldGroup::query()
             ->where('is_active', true)
+            ->where('mode', $mode)
             ->orderBy('title')
             ->get()
             ->filter(fn (FieldGroup $group): bool => $this->matches($group, $page))
