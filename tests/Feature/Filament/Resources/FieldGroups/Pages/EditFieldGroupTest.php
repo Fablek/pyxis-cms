@@ -44,6 +44,32 @@ it('saves nested field definitions', function () {
         ->and($fields[0]['sub_fields'][0]['name'])->toBe('question');
 });
 
+it('saves location rule groups', function () {
+    $group = FieldGroup::factory()->create();
+
+    Livewire::test(EditFieldGroup::class, ['record' => $group->getRouteKey()])
+        ->fillForm([
+            'rules' => [
+                ['conditions' => [
+                    ['param' => 'page_type', 'operator' => '==', 'value' => 'child'],
+                    ['param' => 'page_type', 'operator' => '!=', 'value' => 'parent'],
+                ]],
+                ['conditions' => [
+                    ['param' => 'page_type', 'operator' => '==', 'value' => 'homepage'],
+                ]],
+            ],
+        ])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    $rules = $group->fresh()->rules;
+
+    expect($rules)->toHaveCount(2)
+        ->and($rules[0]['conditions'])->toHaveCount(2)
+        ->and($rules[0]['conditions'][1])->toMatchArray(['param' => 'page_type', 'operator' => '!=', 'value' => 'parent'])
+        ->and($rules[1]['conditions'][0]['value'])->toBe('homepage');
+});
+
 it('rejects field definitions with duplicate names', function () {
     $group = FieldGroup::factory()->create();
 
@@ -107,6 +133,9 @@ it('renders the field group editor without missing translations', function (stri
         'fields' => [
             ['type' => 'repeater', 'label' => 'FAQ', 'name' => 'faq', 'sub_fields' => [textField('question')]],
         ],
+        'rules' => [
+            ['conditions' => [['param' => 'page_type', 'operator' => '==', 'value' => 'homepage']]],
+        ],
     ]);
 
     Livewire::test(EditFieldGroup::class, ['record' => $group->getRouteKey()])
@@ -114,6 +143,6 @@ it('renders the field group editor without missing translations', function (stri
         ->assertDontSee('admin.field_groups')
         ->assertDontSee('admin.custom_fields');
 })->with([
-    'polish' => ['pl', 'Reguły lokalizacji'],
-    'english' => ['en', 'Location rules'],
+    'polish' => ['pl', 'Pokaż tę grupę pól, jeśli'],
+    'english' => ['en', 'Show this field group if'],
 ]);

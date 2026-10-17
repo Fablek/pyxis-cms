@@ -5,6 +5,7 @@ namespace App\Filament\Resources\FieldGroups\Schemas;
 use App\Filament\CustomFields\FieldDefinitionForm;
 use App\Models\FieldGroup;
 use App\Models\Page;
+use App\Services\FieldGroupLocator;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Repeater\TableColumn;
 use Filament\Forms\Components\Select;
@@ -51,38 +52,7 @@ class FieldGroupForm
                     Section::make(__('admin.field_groups.sections.location'))
                         ->description(__('admin.field_groups.sections.location_desc'))
                         ->schema([
-                            Repeater::make('rules')
-                                ->hiddenLabel()
-                                ->table([
-                                    TableColumn::make(__('admin.field_groups.location.param')),
-                                    TableColumn::make(__('admin.field_groups.location.operator'))->width('200px'),
-                                    TableColumn::make(__('admin.field_groups.location.value')),
-                                ])
-                                ->compact()
-                                ->addActionLabel(__('admin.field_groups.location.add'))
-                                ->schema([
-                                    Select::make('param')
-                                        ->options([
-                                            'page_id' => __('admin.field_groups.location.params.page_id'),
-                                        ])
-                                        ->required()
-                                        ->default('page_id')
-                                        ->selectablePlaceholder(false),
-
-                                    Select::make('operator')
-                                        ->options([
-                                            '==' => __('admin.field_groups.location.operators.equals'),
-                                            '!=' => __('admin.field_groups.location.operators.not_equals'),
-                                        ])
-                                        ->required()
-                                        ->default('==')
-                                        ->selectablePlaceholder(false),
-
-                                    Select::make('value')
-                                        ->required()
-                                        ->searchable()
-                                        ->options(fn () => Page::pluck('title', 'id')->toArray()),
-                                ]),
+                            self::locationRules(),
                         ]),
                 ])->columnSpan([
                     'sm' => 1,
@@ -110,6 +80,69 @@ class FieldGroupForm
                     'sm' => 1,
                     'lg' => 1,
                 ]),
+            ]);
+    }
+
+    /**
+     * ACF-like location rules: groups joined with "or", conditions inside a group joined with "and".
+     */
+    protected static function locationRules(): Repeater
+    {
+        return Repeater::make('rules')
+            ->hiddenLabel()
+            ->itemLabel(function (string $key, Repeater $component): string {
+                $isFirstGroup = (string) array_key_first($component->getRawState() ?? []) === $key;
+
+                return __($isFirstGroup ? 'admin.field_groups.location.show_if' : 'admin.field_groups.location.or');
+            })
+            ->addActionLabel(__('admin.field_groups.location.add_group'))
+            ->defaultItems(0)
+            ->schema([
+                Repeater::make('conditions')
+                    ->hiddenLabel()
+                    ->table([
+                        TableColumn::make(__('admin.field_groups.location.param')),
+                        TableColumn::make(__('admin.field_groups.location.operator'))->width('180px'),
+                        TableColumn::make(__('admin.field_groups.location.value')),
+                    ])
+                    ->compact()
+                    ->minItems(1)
+                    ->defaultItems(1)
+                    ->addActionLabel(__('admin.field_groups.location.add_condition'))
+                    ->schema([
+                        Select::make('param')
+                            ->options([
+                                FieldGroupLocator::PARAM_PAGE => __('admin.field_groups.location.params.page'),
+                                FieldGroupLocator::PARAM_PAGE_PARENT => __('admin.field_groups.location.params.page_parent'),
+                                FieldGroupLocator::PARAM_PAGE_TYPE => __('admin.field_groups.location.params.page_type'),
+                            ])
+                            ->default(FieldGroupLocator::PARAM_PAGE)
+                            ->required()
+                            ->live()
+                            ->afterStateUpdated(fn (Set $set) => $set('value', null))
+                            ->selectablePlaceholder(false),
+
+                        Select::make('operator')
+                            ->options([
+                                FieldGroupLocator::OPERATOR_EQUALS => __('admin.field_groups.location.operators.equals'),
+                                FieldGroupLocator::OPERATOR_NOT_EQUALS => __('admin.field_groups.location.operators.not_equals'),
+                            ])
+                            ->default(FieldGroupLocator::OPERATOR_EQUALS)
+                            ->required()
+                            ->selectablePlaceholder(false),
+
+                        Select::make('value')
+                            ->required()
+                            ->searchable()
+                            ->options(fn (Get $get): array => $get('param') === FieldGroupLocator::PARAM_PAGE_TYPE
+                                ? [
+                                    FieldGroupLocator::TYPE_HOMEPAGE => __('admin.field_groups.location.page_types.homepage'),
+                                    FieldGroupLocator::TYPE_TOP_LEVEL => __('admin.field_groups.location.page_types.top_level'),
+                                    FieldGroupLocator::TYPE_PARENT => __('admin.field_groups.location.page_types.parent'),
+                                    FieldGroupLocator::TYPE_CHILD => __('admin.field_groups.location.page_types.child'),
+                                ]
+                                : Page::query()->orderBy('title')->pluck('title', 'id')->all()),
+                    ]),
             ]);
     }
 }

@@ -154,7 +154,7 @@ return [
         'sections' => [
             'fields' => 'Pola',
             'location' => 'Reguły lokalizacji',
-            'location_desc' => 'Pokaż tę grupę pól, jeśli spełniony jest każdy z warunków.',
+            'location_desc' => 'Grupa pojawi się przy stronie, jeśli spełnione są wszystkie warunki w którejkolwiek z grup reguł.',
             'status' => 'Status',
             'settings' => 'Ustawienia grupy',
         ],
@@ -169,16 +169,27 @@ return [
             'updated_at_column' => 'Zmieniono',
         ],
         'location' => [
+            'show_if' => 'Pokaż tę grupę pól, jeśli',
+            'or' => 'lub',
             'param' => 'Parametr',
             'operator' => 'Operator',
             'value' => 'Wartość',
-            'add' => 'Dodaj warunek',
+            'add_condition' => 'Dodaj warunek (i)',
+            'add_group' => 'Dodaj grupę reguł (lub)',
             'params' => [
-                'page_id' => 'Strona',
+                'page' => 'Strona',
+                'page_parent' => 'Strona nadrzędna',
+                'page_type' => 'Typ strony',
             ],
             'operators' => [
-                'equals' => 'jest równa',
-                'not_equals' => 'nie jest równa',
+                'equals' => 'jest',
+                'not_equals' => 'nie jest',
+            ],
+            'page_types' => [
+                'homepage' => 'Strona główna',
+                'top_level' => 'Strona najwyższego poziomu (bez rodzica)',
+                'parent' => 'Strona nadrzędna (ma podstrony)',
+                'child' => 'Podstrona (ma rodzica)',
             ],
         ],
         'preview' => [

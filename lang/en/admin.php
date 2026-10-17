@@ -110,7 +110,7 @@ return [
         'sections' => [
             'fields' => 'Fields',
             'location' => 'Location rules',
-            'location_desc' => 'Show this field group if all of the conditions are met.',
+            'location_desc' => 'The group appears on a page when all conditions of any rule group are met.',
             'status' => 'Status',
             'settings' => 'Group settings',
         ],
@@ -125,16 +125,27 @@ return [
             'updated_at_column' => 'Updated at',
         ],
         'location' => [
+            'show_if' => 'Show this field group if',
+            'or' => 'or',
             'param' => 'Parameter',
             'operator' => 'Operator',
             'value' => 'Value',
-            'add' => 'Add condition',
+            'add_condition' => 'Add condition (and)',
+            'add_group' => 'Add rule group (or)',
             'params' => [
-                'page_id' => 'Page',
+                'page' => 'Page',
+                'page_parent' => 'Parent page',
+                'page_type' => 'Page type',
             ],
             'operators' => [
-                'equals' => 'is equal to',
-                'not_equals' => 'is not equal to',
+                'equals' => 'is',
+                'not_equals' => 'is not',
+            ],
+            'page_types' => [
+                'homepage' => 'Homepage',
+                'top_level' => 'Top level page (no parent)',
+                'parent' => 'Parent page (has children)',
+                'child' => 'Child page (has parent)',
             ],
         ],
         'preview' => [
