@@ -85,4 +85,26 @@ class FieldTypeRegistry
             ->values()
             ->all();
     }
+
+    /**
+     * Transform saved values into their API shape, following the field definitions.
+     *
+     * Only defined fields are returned: values of removed fields are dropped,
+     * and defined fields without a saved value are returned as null.
+     *
+     * @param  array<array<string, mixed>>  $definitions
+     * @param  array<string, mixed>|null  $values
+     * @return array<string, mixed>
+     */
+    public function toApiValues(array $definitions, ?array $values): array
+    {
+        return collect($definitions)
+            ->filter(fn (mixed $definition): bool => is_array($definition)
+                && $this->has($definition['type'] ?? '')
+                && filled($definition['name'] ?? null))
+            ->mapWithKeys(fn (array $definition): array => [
+                $definition['name'] => $this->get($definition['type'])->toApi($values[$definition['name']] ?? null, $definition),
+            ])
+            ->all();
+    }
 }

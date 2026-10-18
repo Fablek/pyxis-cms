@@ -2,10 +2,12 @@
 
 namespace App\Filament\CustomFields\FieldTypes;
 
+use App\Models\Media;
 use Awcodes\Curator\Components\Forms\CuratorPicker;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Component;
 use Filament\Support\Icons\Heroicon;
+use Illuminate\Support\Str;
 
 class GalleryField extends FieldType
 {
@@ -43,5 +45,17 @@ class GalleryField extends FieldType
         }
 
         return $picker;
+    }
+
+    public function toApi(mixed $value, array $config): mixed
+    {
+        $ids = array_values(array_filter((array) $value, fn (mixed $id): bool => is_string($id) && Str::isUuid($id)));
+        $media = Media::query()->whereIn('id', $ids)->get()->keyBy('id');
+
+        return collect($ids)
+            ->map(fn (string $id): ?array => ImageField::mediaToApi($media->get($id)))
+            ->filter()
+            ->values()
+            ->all();
     }
 }

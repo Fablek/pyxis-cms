@@ -74,4 +74,13 @@ class RepeaterField extends FieldType
             ->addActionLabel(filled($config['button_label'] ?? null) ? $config['button_label'] : __('admin.custom_fields.settings.add_item'))
             ->collapsible();
     }
+
+    public function toApi(mixed $value, array $config): mixed
+    {
+        return collect(is_array($value) ? $value : [])
+            ->map(fn (mixed $item): array => app(FieldTypeRegistry::class)
+                ->toApiValues($config['sub_fields'] ?? [], is_array($item) ? $item : []))
+            ->values()
+            ->all();
+    }
 }

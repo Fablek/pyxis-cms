@@ -51,4 +51,10 @@ class GroupField extends FieldType
             ->columns(['default' => 1, 'lg' => 12])
             ->schema(app(FieldTypeRegistry::class)->formComponents($config['sub_fields'] ?? []));
     }
+
+    public function toApi(mixed $value, array $config): mixed
+    {
+        return app(FieldTypeRegistry::class)
+            ->toApiValues($config['sub_fields'] ?? [], is_array($value) ? $value : []);
+    }
 }

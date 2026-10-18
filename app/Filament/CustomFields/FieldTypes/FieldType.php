@@ -87,6 +87,16 @@ abstract class FieldType
     }
 
     /**
+     * Transform a saved value into the shape returned by the API (e.g. media ID → URL).
+     *
+     * @param  array<string, mixed>  $config
+     */
+    public function toApi(mixed $value, array $config): mixed
+    {
+        return $value;
+    }
+
+    /**
      * @param  array<string, mixed>  $config
      */
     public function toFormComponent(array $config): Component
