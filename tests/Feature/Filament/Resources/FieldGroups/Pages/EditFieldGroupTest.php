@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\FieldGroupMode;
 use App\Filament\CustomFields\FieldTypeRegistry;
 use App\Filament\Resources\FieldGroups\Pages\EditFieldGroup;
 use App\Models\FieldGroup;
@@ -146,3 +147,16 @@ it('renders the field group editor without missing translations', function (stri
     'polish' => ['pl', 'Pokaż tę grupę pól, jeśli'],
     'english' => ['en', 'Show this field group if'],
 ]);
+
+it('saves the field group mode', function () {
+    $group = FieldGroup::factory()->create();
+
+    expect($group->fresh()->mode)->toBe(FieldGroupMode::STATIC);
+
+    Livewire::test(EditFieldGroup::class, ['record' => $group->getRouteKey()])
+        ->fillForm(['mode' => FieldGroupMode::BLOCK->value])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    expect($group->fresh()->mode)->toBe(FieldGroupMode::BLOCK);
+});
