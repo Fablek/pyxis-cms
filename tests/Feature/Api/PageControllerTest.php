@@ -2,9 +2,15 @@
 
 use App\Enums\PageStatus;
 use App\Enums\PageVisibility;
+use App\Models\FieldGroup;
 use App\Models\Page;
 use App\Models\Role;
 use App\Models\Setting;
+
+function heroFieldGroup(array $fields = [['type' => 'text', 'label' => 'Tytuł', 'name' => 'title']]): FieldGroup
+{
+    return FieldGroup::factory()->create(['slug' => 'hero', 'fields' => $fields]);
+}
 
 it('returns the correct homepage based on global settings', function () {
     // Arrange
@@ -106,6 +112,7 @@ it('returns 200 but hides content for password protected pages', function () {
         'status' => PageStatus::PUBLISHED,
         'visibility' => PageVisibility::PASSWORD,
         'content' => ['blocks' => 'this should be hidden'],
+        'fields' => ['hero' => ['title' => 'this should be hidden too']],
     ]);
 
     Setting::set('site_language', 'pl');
@@ -115,7 +122,8 @@ it('returns 200 but hides content for password protected pages', function () {
 
     $response->assertStatus(200)
         ->assertJsonPath('data.is_password_protected', true)
-        ->assertJsonPath('data.content', null);
+        ->assertJsonPath('data.content', null)
+        ->assertJsonPath('data.fields', null);
 });
 
 it('returns 404 when homepage is requested but not set in settings', function () {
@@ -134,4 +142,87 @@ it('returns 403 when the preview token is invalid', function () {
 
     $response->assertForbidden()
         ->assertJsonPath('message', 'Invalid or malformed preview token.');
+});
+
+it('returns published static field values', function () {
+    heroFieldGroup();
+
+    Page::factory()->create([
+        'slug' => 'kontakt',
+        'fields' => ['hero' => ['title' => 'Opublikowany']],
+        'fields_draft' => ['hero' => ['title' => 'Szkic']],
+    ]);
+
+    $this->getJson('/api/pages/kontakt')
+        ->assertOk()
+        ->assertJsonPath('data.fields.hero.title', 'Opublikowany');
+});
+
+it('returns draft static field values in preview mode', function () {
+    heroFieldGroup();
+
+    Page::factory()->create([
+        'slug' => 'kontakt',
+        'fields' => ['hero' => ['title' => 'Opublikowany']],
+        'fields_draft' => ['hero' => ['title' => 'Szkic']],
+    ]);
+
+    $this->getJson('/api/pages/kontakt', [
+        config('pyxis.preview.header') => encrypt(config('pyxis.preview.secret')),
+    ])
+        ->assertOk()
+        ->assertJsonPath('data.is_preview', true)
+        ->assertJsonPath('data.fields.hero.title', 'Szkic');
+});
+
+it('returns static field values transformed for the frontend', function () {
+    $linkedPage = Page::factory()->create(['slug' => 'oferta']);
+    heroFieldGroup([
+        ['type' => 'text', 'label' => 'Tytuł', 'name' => 'title'],
+        ['type' => 'page', 'label' => 'Link', 'name' => 'cta'],
+    ]);
+
+    Page::factory()->create([
+        'slug' => 'kontakt',
+        'fields' => ['hero' => ['title' => 'Witaj', 'cta' => $linkedPage->id, 'removed_field' => 'x']],
+    ]);
+
+    $this->getJson('/api/pages/kontakt')
+        ->assertOk()
+        ->assertJsonPath('data.fields.hero.cta.full_url', '/oferta')
+        ->assertJsonPath('data.fields.hero.cta.title', $linkedPage->title)
+        ->assertJsonMissingPath('data.fields.hero.removed_field');
+});
+
+it('does not expose links to unpublished pages', function () {
+    $draftPage = Page::factory()->create(['status' => PageStatus::DRAFT]);
+    heroFieldGroup([['type' => 'page', 'label' => 'Link', 'name' => 'cta']]);
+
+    Page::factory()->create([
+        'slug' => 'kontakt',
+        'fields' => ['hero' => ['cta' => $draftPage->id]],
+    ]);
+
+    $this->getJson('/api/pages/kontakt')
+        ->assertOk()
+        ->assertJsonPath('data.fields.hero.cta', null);
+});
+
+it('returns content blocks transformed and keeps unknown items unchanged', function () {
+    $linkedPage = Page::factory()->create(['slug' => 'oferta']);
+    heroFieldGroup([['type' => 'page', 'label' => 'Link', 'name' => 'cta']]);
+
+    Page::factory()->create([
+        'slug' => 'kontakt',
+        'content' => [
+            ['type' => 'hero', 'data' => ['cta' => $linkedPage->id]],
+            ['type' => 'legacy', 'data' => ['raw' => 'unchanged']],
+        ],
+    ]);
+
+    $this->getJson('/api/pages/kontakt')
+        ->assertOk()
+        ->assertJsonPath('data.content.0.type', 'hero')
+        ->assertJsonPath('data.content.0.data.cta.full_url', '/oferta')
+        ->assertJsonPath('data.content.1', ['type' => 'legacy', 'data' => ['raw' => 'unchanged']]);
 });

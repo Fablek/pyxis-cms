@@ -190,3 +190,66 @@ body {
 .fi-page > section {
     padding: 24px;
 }
+/* --- 5. CUSTOM FIELDS (ACF-like field group editor) --- */
+
+/* Field rows: number, label, system name, type */
+.pyxis-fields-table {
+    counter-reset: pyxis-field;
+}
+
+.pyxis-fields-table .fi-fo-repeater-item {
+    counter-increment: pyxis-field;
+}
+
+.pyxis-fields-table .fi-fo-repeater-item-header-label {
+    flex: 1;
+    min-width: 0;
+}
+
+.pyxis-field-row {
+    display: grid;
+    grid-template-columns: 1.5rem minmax(0, 1fr) minmax(0, 12rem) minmax(0, 9rem);
+    align-items: center;
+    column-gap: 0.75rem;
+    width: 100%;
+}
+
+.pyxis-field-number {
+    @apply flex size-6 items-center justify-center rounded-full bg-gray-100 text-xs font-normal text-gray-600 dark:bg-white/10 dark:text-gray-300;
+}
+
+.pyxis-field-number::before {
+    content: counter(pyxis-field);
+}
+
+.pyxis-fields-table .fi-fo-repeater-item:not(.fi-collapsed) > .fi-fo-repeater-item-header {
+    @apply bg-gray-50 dark:bg-white/5;
+}
+
+@media (max-width: 767px) {
+    .pyxis-field-row {
+        grid-template-columns: 1.5rem minmax(0, 1fr);
+    }
+
+    .pyxis-field-col {
+        display: none;
+    }
+}
+
+/* Underlined, left-aligned tabs (instead of the centered pill tabs) */
+.pyxis-tabs.fi-tabs,
+.pyxis-tabs .fi-tabs {
+    @apply mx-0 mb-2 gap-x-6 rounded-none bg-transparent p-0 shadow-none ring-0 border-b border-gray-200 dark:border-white/10 dark:bg-transparent;
+}
+
+.pyxis-tabs .fi-tabs-item {
+    @apply -mb-px rounded-none border-b-2 border-transparent px-0 py-2.5 hover:bg-transparent focus-visible:bg-transparent dark:hover:bg-transparent;
+
+    &.fi-active {
+        @apply border-gray-950 bg-transparent dark:border-white dark:bg-transparent;
+
+        & .fi-tabs-item-label {
+            @apply text-gray-950 dark:text-white;
+        }
+    }
+}

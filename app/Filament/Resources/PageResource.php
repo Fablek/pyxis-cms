@@ -5,6 +5,8 @@ namespace App\Filament\Resources;
 use App\Enums\PageStatus;
 use App\Enums\PageVisibility;
 use App\Filament\Resources\PageResource\Pages;
+use App\Filament\CustomFields\PageFieldsForm;
+use App\Filament\CustomFields\PageContentBuilder;
 use App\Models\Page;
 use App\Models\Setting;
 use App\Services\PageService;
@@ -13,7 +15,6 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
-use Filament\Forms\Components\Builder as CompBuilder;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
@@ -97,10 +98,9 @@ class PageResource extends Resource
                                 return (string)$record->id === (string)Setting::get('homepage_id');
                             }),
 
-                        CompBuilder::make('content_draft')
-                            ->label(__('admin.pages.fields.content_draft'))
-                            ->blocks([])
-                            ->columnSpanFull(),
+                        PageContentBuilder::make(),
+
+                        PageFieldsForm::make(),
                     ])
                     ->columns(1)
                     ->columnSpan([
@@ -171,6 +171,7 @@ class PageResource extends Resource
 
                                         $record->update([
                                             'content' => $record->content_draft,
+                                            'fields' => $record->fields_draft,
                                             'status' => PageStatus::PUBLISHED,
                                         ]);
                                     
@@ -207,7 +208,7 @@ class PageResource extends Resource
                                             $record->delete();
                                             return redirect($livewire->getResource()::getUrl('index'));
                                         }),
-                            ]),
+                            ])->key('pageActions'),
                         ])
                         ->columns(1),
                     
