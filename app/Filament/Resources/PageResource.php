@@ -8,6 +8,7 @@ use App\Filament\Resources\PageResource\Pages;
 use App\Models\Page;
 use App\Models\Setting;
 use App\Services\PageService;
+use App\Services\FrontendRevalidator;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -174,17 +175,7 @@ class PageResource extends Resource
                                             'status' => PageStatus::PUBLISHED,
                                         ]);
                                     
-                                        try {
-                                            $frontendUrl = config('app.frontend_url', 'http://localhost:3000');
-                                            $revalidateToken = config('app.revalidate_token', 'super-secret-token');
-                                            
-                                            \Illuminate\Support\Facades\Http::post("{$frontendUrl}/api/revalidate", [
-                                                'secret' => $revalidateToken,
-                                                'path' => $record->full_url === '/' ? '/' : $record->full_url,
-                                            ]);
-                                        } catch (\Exception $e) {
-                                            \Log::error("Revalidation error: " . $e->getMessage());
-                                        }
+                                        app(FrontendRevalidator::class)->revalidate($record);
 
                                         \Filament\Notifications\Notification::make()
                                             ->title(__('admin.pages.notifications.published'))
