@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Log;
 
 beforeEach(function () {
     config([
-        'app.frontend_url' => 'http://frontend.test',
+        'pyxis.revalidate.urls' => ['http://frontend.test'],
         'pyxis.revalidate.token' => 'shared-secret',
     ]);
 });
@@ -53,5 +53,32 @@ it('logs and reports an unreachable frontend', function () {
 
     expect(app(FrontendRevalidator::class)->revalidate($page))->toBeFalse();
 
+    Log::shouldHaveReceived('warning')->once();
+});
+
+it('notifies every configured frontend and reports a failure of any of them', function () {
+    config(['pyxis.revalidate.urls' => ['http://next.test', 'http://astro.test/']]);
+    Http::fake([
+        'next.test/*' => Http::response(['revalidated' => true]),
+        'astro.test/*' => Http::response(['message' => 'Invalid token'], 401),
+    ]);
+    $page = Page::factory()->create();
+
+    expect(app(FrontendRevalidator::class)->revalidate($page))->toBeFalse();
+
+    Http::assertSentCount(2);
+    Http::assertSent(fn (Request $request): bool => $request->url() === 'http://next.test/api/revalidate');
+    Http::assertSent(fn (Request $request): bool => $request->url() === 'http://astro.test/api/revalidate');
+});
+
+it('logs and skips revalidation when no frontend is configured', function () {
+    config(['pyxis.revalidate.urls' => []]);
+    Http::fake();
+    Log::spy();
+    $page = Page::factory()->create();
+
+    expect(app(FrontendRevalidator::class)->revalidate($page))->toBeFalse();
+
+    Http::assertNothingSent();
     Log::shouldHaveReceived('warning')->once();
 });
