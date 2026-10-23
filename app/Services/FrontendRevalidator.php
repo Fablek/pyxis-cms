@@ -14,10 +14,28 @@ use Illuminate\Support\Facades\Log;
  */
 class FrontendRevalidator
 {
+    /**
+     * Notifies every configured frontend. Returns true only when all of them accepted the request.
+     */
     public function revalidate(Page $page): bool
     {
-        $url = rtrim((string) config('app.frontend_url'), '/').'/api/revalidate';
+        $urls = config('pyxis.revalidate.urls', []);
 
+        if ($urls === []) {
+            Log::warning('Frontend revalidation skipped: no frontend URLs configured (REVALIDATE_URLS).');
+
+            return false;
+        }
+
+        $results = collect($urls)->map(
+            fn (string $frontendUrl): bool => $this->notify(rtrim($frontendUrl, '/').'/api/revalidate', $page)
+        );
+
+        return ! $results->contains(false);
+    }
+
+    protected function notify(string $url, Page $page): bool
+    {
         try {
             $response = Http::timeout(5)->post($url, [
                 'secret' => config('pyxis.revalidate.token'),
