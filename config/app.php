@@ -16,6 +16,11 @@ return [
     'name' => env('APP_NAME', 'Laravel'),
 
     /*
+    | Pyxis CMS version shown in the admin panel (bumped on every release)
+    */
+    'version' => '1.4.0',
+
+    /*
     |--------------------------------------------------------------------------
     | Application Environment
     |--------------------------------------------------------------------------
