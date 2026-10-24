@@ -159,6 +159,12 @@ return [
             'block' => 'Blok treści',
             'block_help' => 'Redaktor dodaje blok do treści strony dowolną liczbę razy i w dowolnej kolejności.',
         ],
+        'tabs' => [
+            'all' => 'Wszystkie',
+        ],
+        'filters' => [
+            'page' => 'Dostępne na stronie',
+        ],
         'sections' => [
             'fields' => 'Pola',
             'location' => 'Reguły lokalizacji',
@@ -175,6 +181,7 @@ return [
             'updated_at' => 'Ostatnia zmiana: :time',
             'created_at' => 'Utworzono',
             'updated_at_column' => 'Zmieniono',
+            'fields_column' => 'Pola',
         ],
         'location' => [
             'show_if' => 'Pokaż tę grupę pól, jeśli',

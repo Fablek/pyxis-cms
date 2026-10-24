@@ -115,6 +115,12 @@ return [
             'block' => 'Content block',
             'block_help' => 'Editors add the block to the page content any number of times, in any order.',
         ],
+        'tabs' => [
+            'all' => 'All',
+        ],
+        'filters' => [
+            'page' => 'Available on page',
+        ],
         'sections' => [
             'fields' => 'Fields',
             'location' => 'Location rules',
@@ -131,6 +137,7 @@ return [
             'updated_at' => 'Last modified: :time',
             'created_at' => 'Created at',
             'updated_at_column' => 'Updated at',
+            'fields_column' => 'Fields',
         ],
         'location' => [
             'show_if' => 'Show this field group if',
