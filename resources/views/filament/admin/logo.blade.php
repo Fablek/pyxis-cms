@@ -19,7 +19,7 @@
         </span>
         
         <span class="text-[10px] text-gray-500 dark:text-gray-400 font-medium leading-none mt-1">
-            v1.0.0
+            v{{ config('app.version') }}
         </span>
     </div>
 </div>

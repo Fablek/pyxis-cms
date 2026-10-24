@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Exceptions\PageNotFoundException;
 use App\Models\Page;
 use App\Models\Setting;
 
@@ -29,28 +30,28 @@ class PageService
 
         $page = $this->resolvePage($slug, $homepageId);
 
-        if (!$page) {
-            throw new \App\Exceptions\PageNotFoundException('Page not found');
+        if (! $page) {
+            throw new PageNotFoundException('Page not found');
         }
 
         // Basic Validations (Quick Exits)
-        if (!$page->isLive() && !$isPreview) {
-            throw new \App\Exceptions\PageNotFoundException('Page not found');
+        if (! $page->isLive() && ! $isPreview) {
+            throw new PageNotFoundException('Page not found');
         }
 
         // Blocking access to the home page by its slug
-        if ($slug && (string)$page->id === (string)$homepageId) {
-            throw new \App\Exceptions\PageNotFoundException('Use root path for homepage');
+        if ($slug && (string) $page->id === (string) $homepageId) {
+            throw new PageNotFoundException('Use root path for homepage');
         }
 
         // Path validation (for subpages only)
         if ($slug && trim($page->full_url, '/') !== trim($slug, '/')) {
-            throw new \App\Exceptions\PageNotFoundException('Path mismatch');
+            throw new PageNotFoundException('Path mismatch');
         }
 
         // Parent validation
-        if (!$isPreview && !$this->allParentsPublished($page)) {
-            throw new \App\Exceptions\PageNotFoundException('One of the parent pages is not published');
+        if (! $isPreview && ! $this->allParentsPublished($page)) {
+            throw new PageNotFoundException('One of the parent pages is not published');
         }
 
         return $page;
@@ -59,9 +60,9 @@ class PageService
     /**
      * Recursively checks if each parent up the tree is "live"
      */
-    public function allParentsPublished(Page $page): bool 
+    public function allParentsPublished(Page $page): bool
     {
-        return $page->ancestors->every(fn($parent) => $parent->isLive());
+        return $page->ancestors->every(fn ($parent) => $parent->isLive());
     }
 
     /**
