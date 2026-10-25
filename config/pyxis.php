@@ -32,4 +32,15 @@ return [
         // Inside Docker use container names, e.g. http://pyxis-view-next:3000
         'urls' => array_values(array_filter(array_map('trim', explode(',', (string) env('REVALIDATE_URLS', env('FRONTEND_URL', '')))))),
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Plugins
+    |--------------------------------------------------------------------------
+    */
+
+    'plugins' => [
+        // Directory with installed plugins (one subdirectory per plugin)
+        'path' => base_path('py-content/plugins'),
+    ],
 ];

@@ -43,4 +43,14 @@ class UserFactory extends Factory
             'email_verified_at' => null,
         ]);
     }
+
+    /**
+     * Indicate that the user has the admin role.
+     */
+    public function admin(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role_id' => Role::query()->firstOrCreate(['slug' => 'admin'], ['name' => 'Administrator'])->id,
+        ]);
+    }
 }

@@ -236,4 +236,35 @@ return [
             'new_tab' => 'Open in a new tab',
         ],
     ],
+    'plugins' => [
+        'label' => 'Plugin',
+        'plural_label' => 'Plugins',
+        'nav_label' => 'Plugins',
+        'fields' => [
+            'name' => 'Name',
+            'version' => 'Version',
+            'author' => 'Author',
+            'is_active' => 'Active',
+            'error' => 'Error',
+            'archive' => 'ZIP archive',
+        ],
+        'actions' => [
+            'activate' => 'Activate',
+            'deactivate' => 'Deactivate',
+            'upload' => 'Upload plugin',
+        ],
+        'notifications' => [
+            'activated' => 'The plugin has been activated.',
+            'activation_failed' => 'The plugin could not be activated.',
+            'deactivated' => 'The plugin has been deactivated.',
+            'install_failed' => 'The plugin could not be installed.',
+            'installed' => 'The ":name" plugin has been installed. Activate it to start using it.',
+        ],
+        'errors' => [
+            'invalid_archive' => 'The file is not a valid ZIP archive.',
+            'unsafe_archive' => 'The archive contains forbidden file paths.',
+            'invalid_manifest' => 'The archive does not contain a valid plugin.json file.',
+            'already_installed' => 'The ":slug" plugin is already installed.',
+        ],
+    ],
 ];

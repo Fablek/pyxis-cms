@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Facades\File;
+
 /*
 |--------------------------------------------------------------------------
 | Test Case
@@ -42,7 +44,34 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
+/**
+ * Points the plugins path at a fresh temporary directory and returns it.
+ */
+function usePluginsDirectory(): string
 {
-    // ..
+    $path = storage_path('framework/testing/plugins-'.uniqid());
+    File::makeDirectory($path, recursive: true);
+    config(['pyxis.plugins.path' => $path]);
+
+    return $path;
+}
+
+/**
+ * Builds a ZIP archive from a map of entry names to contents and returns its path.
+ *
+ * @param  array<string, string>  $files
+ */
+function makePluginArchive(array $files): string
+{
+    $path = config('pyxis.plugins.path').'/plugin-'.uniqid().'.zip';
+    $zip = new ZipArchive;
+    $zip->open($path, ZipArchive::CREATE);
+
+    foreach ($files as $name => $contents) {
+        $zip->addFromString($name, $contents);
+    }
+
+    $zip->close();
+
+    return $path;
 }

@@ -8,8 +8,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
 
-class User extends Authenticatable
+class User extends Authenticatable implements FilamentUser
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasApiTokens, HasFactory, Notifiable, HasUuids;
@@ -52,5 +54,13 @@ class User extends Authenticatable
     public function isAdmin(): bool
     {
         return $this->role?->slug === 'admin';
+    }
+
+    /**
+     * Every user with an assigned role can sign in to the admin panel; role checks inside it decide what they see.
+     */
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return $this->role !== null;
     }
 }
