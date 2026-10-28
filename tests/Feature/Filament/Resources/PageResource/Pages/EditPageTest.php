@@ -5,6 +5,7 @@ use App\Filament\Resources\PageResource\Pages\EditPage;
 use App\Models\FieldGroup;
 use App\Models\Page;
 use App\Models\User;
+use App\Plugins\Hook;
 use Filament\Actions\Testing\TestAction;
 use Filament\Forms\Components\Builder;
 use Illuminate\Support\Facades\Http;
@@ -121,4 +122,17 @@ it('keeps blocks of groups that are no longer available but stops offering them'
 
     expect($page->fresh()->content_draft)->toBe([['type' => 'hero', 'data' => ['title' => 'Witaj']]])
         ->and(pickerBlocks($livewire))->toBe([]);
+});
+
+it('runs the page.published action on publish', function () {
+    $page = Page::factory()->create();
+    $published = [];
+    Hook::action('page.published', function (Page $page) use (&$published): void {
+        $published[] = $page->id;
+    });
+
+    Livewire::test(EditPage::class, ['record' => $page->getRouteKey()])
+        ->callAction(TestAction::make('publish')->schemaComponent('pageActions'));
+
+    expect($published)->toBe([$page->id]);
 });

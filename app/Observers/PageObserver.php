@@ -4,6 +4,7 @@ namespace App\Observers;
 
 use App\Models\Page;
 use App\Models\Setting;
+use App\Plugins\Hook;
 
 class PageObserver
 {
@@ -19,5 +20,13 @@ class PageObserver
             $page->slug = null;
             $page->parent_id = null;
         }
+    }
+
+    /**
+     * Lets plugins react to every saved page (created, updated or published).
+     */
+    public function saved(Page $page): void
+    {
+        Hook::doAction('page.saved', $page);
     }
 }
