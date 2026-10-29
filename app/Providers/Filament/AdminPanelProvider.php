@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Plugins\Hook;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -25,7 +26,7 @@ class AdminPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
-        return $panel
+        $panel
             ->default()
             ->id('admin')
             ->brandLogo(fn () => view('filament.admin.logo'))
@@ -101,6 +102,8 @@ class AdminPanelProvider extends PanelProvider
                     ->navigationIcon('heroicon-o-photo')
                     ->registerNavigation(false) 
             ]);
+
+        return Hook::applyFilters('admin.panel', $panel);
     }
 
     public function register(): void

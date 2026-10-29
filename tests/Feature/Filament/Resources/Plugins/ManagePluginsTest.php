@@ -4,10 +4,12 @@ use App\Filament\Resources\Plugins\Pages\ManagePlugins;
 use App\Filament\Resources\Plugins\PluginResource;
 use App\Models\Plugin;
 use App\Models\User;
+use App\Plugins\PluginManager;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\Testing\TestAction;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Schema;
 use Livewire\Livewire;
 
 beforeEach(function () {
@@ -110,3 +112,17 @@ it('has every plugin translation in both languages', function (string $locale) {
         expect(__("admin.plugins.{$key}"))->not->toBe("admin.plugins.{$key}");
     }
 })->with(['pl', 'en']);
+
+it('deletes plugin data when requested', function () {
+    $this->actingAs(User::factory()->admin()->create());
+    makePluginFile('migrated', '');
+    makePluginMigration('migrated', 'migrated_items');
+    $plugin = Plugin::factory()->create(['slug' => 'migrated']);
+    app(PluginManager::class)->activate($plugin);
+    $plugin->update(['is_active' => false]);
+
+    Livewire::test(ManagePlugins::class)
+        ->callAction(TestAction::make(DeleteAction::class)->table($plugin), ['delete_data' => true]);
+
+    expect(Schema::hasTable('migrated_items'))->toBeFalse();
+});

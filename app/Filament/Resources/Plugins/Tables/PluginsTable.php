@@ -6,6 +6,7 @@ use App\Models\Plugin;
 use App\Plugins\PluginManager;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
+use Filament\Forms\Components\Checkbox;
 use Filament\Notifications\Notification;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\IconColumn;
@@ -71,7 +72,11 @@ class PluginsTable
                     }),
                 DeleteAction::make()
                     ->hidden(fn (Plugin $record): bool => $record->is_active)
-                    ->using(fn (Plugin $record) => app(PluginManager::class)->uninstall($record)),
+                    ->schema([
+                        Checkbox::make('delete_data')
+                            ->label(__('admin.plugins.fields.delete_data')),
+                    ])
+                    ->using(fn (Plugin $record, array $data) => app(PluginManager::class)->uninstall($record, $data['delete_data'] ?? false)),
             ]);
     }
 }

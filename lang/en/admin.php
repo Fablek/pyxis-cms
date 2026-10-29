@@ -247,6 +247,7 @@ return [
             'is_active' => 'Active',
             'error' => 'Error',
             'archive' => 'ZIP archive',
+            'delete_data' => 'Also delete plugin data',
         ],
         'actions' => [
             'activate' => 'Activate',

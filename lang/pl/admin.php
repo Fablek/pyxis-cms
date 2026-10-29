@@ -291,6 +291,7 @@ return [
             'is_active' => 'Aktywna',
             'error' => 'Błąd',
             'archive' => 'Archiwum ZIP',
+            'delete_data' => 'Usuń też dane wtyczki',
         ],
         'actions' => [
             'activate' => 'Włącz',

@@ -1,6 +1,8 @@
 <?php
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\File;
+use Tests\TestCase;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,8 +15,8 @@ use Illuminate\Support\Facades\File;
 |
 */
 
-pest()->extend(Tests\TestCase::class)
-    ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
+pest()->extend(TestCase::class)
+    ->use(RefreshDatabase::class)
     ->beforeEach(fn () => cache()->flush())
     ->in('Feature');
 
@@ -74,4 +76,54 @@ function makePluginArchive(array $files): string
     $zip->close();
 
     return $path;
+}
+
+/**
+ * Adds a migration creating the given table to a plugin.
+ */
+function makePluginMigration(string $slug, string $table): void
+{
+    $path = config('pyxis.plugins.path')."/{$slug}/database/migrations";
+    File::makeDirectory($path, recursive: true);
+    File::put("{$path}/2026_01_01_000000_create_{$table}_table.php", <<<PHP
+        <?php
+
+        use Illuminate\\Database\\Migrations\\Migration;
+        use Illuminate\\Database\\Schema\\Blueprint;
+        use Illuminate\\Support\\Facades\\Schema;
+
+        return new class extends Migration
+        {
+            public function up(): void
+            {
+                Schema::create('{$table}', function (Blueprint \$table) {
+                    \$table->id();
+                });
+            }
+
+            public function down(): void
+            {
+                Schema::dropIfExists('{$table}');
+            }
+        };
+        PHP);
+}
+
+/**
+ * Creates a plugin directory with the given plugin.json (array or raw string).
+ */
+function makePlugin(string $directory, array|string $manifest): void
+{
+    $path = config('pyxis.plugins.path').'/'.$directory;
+    File::makeDirectory($path, recursive: true);
+    File::put($path.'/plugin.json', is_array($manifest) ? json_encode($manifest) : $manifest);
+}
+
+/**
+ * Creates a plugin with a valid manifest and a plugin.php containing the given code.
+ */
+function makePluginFile(string $slug, string $code): void
+{
+    makePlugin($slug, ['name' => $slug, 'slug' => $slug, 'version' => '1.0.0']);
+    File::put(config('pyxis.plugins.path')."/{$slug}/plugin.php", "<?php\n\n{$code}\n");
 }
