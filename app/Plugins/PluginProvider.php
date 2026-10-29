@@ -2,6 +2,8 @@
 
 namespace App\Plugins;
 
+use App\Filament\CustomFields\FieldTypeRegistry;
+use App\Filament\CustomFields\FieldTypes\FieldType;
 use Filament\Contracts\Plugin as FilamentPlugin;
 use Filament\Panel;
 use Illuminate\Support\Facades\Route;
@@ -48,5 +50,16 @@ abstract class PluginProvider extends ServiceProvider
     protected function registerAdminPlugin(FilamentPlugin $plugin): void
     {
         Hook::filter('admin.panel', fn (Panel $panel): Panel => $panel->plugin($plugin));
+    }
+
+    /**
+     * Adds a custom field type to the field group editor, page forms and the API.
+     */
+    protected function registerFieldType(FieldType $type): void
+    {
+        $this->app->extend(
+            FieldTypeRegistry::class,
+            fn (FieldTypeRegistry $registry): FieldTypeRegistry => tap($registry)->register($type),
+        );
     }
 }

@@ -1,11 +1,16 @@
 <?php
 
+use App\Filament\CustomFields\FieldTypeRegistry;
+use App\Filament\CustomFields\FieldTypes\FieldType;
 use App\Models\Plugin;
 use App\Plugins\Hook;
 use App\Plugins\PluginInstallException;
 use App\Plugins\PluginManager;
 use Filament\Contracts\Plugin as FilamentPlugin;
+use Filament\Forms\Components\TextInput;
 use Filament\Panel;
+use Filament\Schemas\Components\Component;
+use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\Facades\File;
 
 beforeEach(function () {
@@ -34,6 +39,37 @@ class FakeAdminPlugin implements FilamentPlugin
     public function register(Panel $panel): void {}
 
     public function boot(Panel $panel): void {}
+}
+
+/**
+ * Minimal custom field type used to check that plugins can add field types.
+ */
+class FakeColorField extends FieldType
+{
+    public function key(): string
+    {
+        return 'fake_color';
+    }
+
+    public function label(): string
+    {
+        return 'Color';
+    }
+
+    public function icon(): Heroicon
+    {
+        return Heroicon::OutlinedSwatch;
+    }
+
+    protected function makeFormComponent(array $config): Component
+    {
+        return TextInput::make($config['name']);
+    }
+
+    public function toApi(mixed $value, array $config): mixed
+    {
+        return strtoupper((string) $value);
+    }
 }
 
 /**
@@ -365,4 +401,16 @@ it('removes a plugin even when its uninstall.php fails', function () {
 
     expect(Plugin::query()->whereKey($plugin->id)->exists())->toBeFalse()
         ->and(File::isDirectory($this->pluginsPath.'/lifecycle'))->toBeFalse();
+});
+
+it('adds a plugin field type to the field type registry', function () {
+    makeProviderPlugin('provided', '$this->registerFieldType(new \FakeColorField);');
+    $plugin = Plugin::factory()->create(['slug' => 'provided', 'is_active' => true]);
+
+    expect(app(PluginManager::class)->load($plugin))->toBeTrue();
+    $registry = app(FieldTypeRegistry::class);
+
+    expect($registry->options())->toHaveKey('fake_color', 'Color')
+        ->and($registry->toApiValues([['type' => 'fake_color', 'name' => 'accent']], ['accent' => '#ff0000']))
+        ->toBe(['accent' => '#FF0000']);
 });
