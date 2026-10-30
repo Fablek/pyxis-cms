@@ -89,6 +89,15 @@ it('copies draft field values to the published fields on publish', function () {
     expect($page->fresh()->fields)->toBe(['hero' => ['title' => 'Witaj']]);
 });
 
+it('copies the draft seo to the published seo on publish', function () {
+    $page = Page::factory()->create(['seo_draft' => ['title' => 'Tytuł SEO']]);
+
+    Livewire::test(EditPage::class, ['record' => $page->getRouteKey()])
+        ->callAction(TestAction::make('publish')->schemaComponent('pageActions'));
+
+    expect($page->fresh()->seo)->toBe(['title' => 'Tytuł SEO']);
+});
+
 it('offers block groups in the content builder instead of static sections', function () {
     $page = Page::factory()->create();
     heroGroupFor('page', $page->id)->update(['mode' => FieldGroupMode::BLOCK]);

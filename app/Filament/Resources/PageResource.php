@@ -174,6 +174,7 @@ class PageResource extends Resource
                                         $record->update([
                                             'content' => $record->content_draft,
                                             'fields' => $record->fields_draft,
+                                            'seo' => $record->seo_draft,
                                             'status' => PageStatus::PUBLISHED,
                                         ]);
                                     
