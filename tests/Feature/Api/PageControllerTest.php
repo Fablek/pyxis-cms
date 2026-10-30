@@ -2,6 +2,7 @@
 
 use App\Enums\PageStatus;
 use App\Enums\PageVisibility;
+use App\Plugins\Hook;
 use App\Models\FieldGroup;
 use App\Models\Page;
 use App\Models\Role;
@@ -225,4 +226,14 @@ it('returns content blocks transformed and keeps unknown items unchanged', funct
         ->assertJsonPath('data.content.0.type', 'hero')
         ->assertJsonPath('data.content.0.data.cta.full_url', '/oferta')
         ->assertJsonPath('data.content.1', ['type' => 'legacy', 'data' => ['raw' => 'unchanged']]);
+});
+
+it('lets plugins filter the page api response', function () {
+    Hook::filter('page.api', fn (array $data, Page $page): array => [...$data, 'title_length' => mb_strlen($page->title)]);
+
+    Page::factory()->create(['slug' => 'kontakt', 'title' => 'Kontakt']);
+
+    $this->getJson('/api/pages/kontakt')
+        ->assertOk()
+        ->assertJsonPath('data.title_length', 7);
 });

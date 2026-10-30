@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use App\Enums\PageVisibility;
 use App\Models\Setting;
+use App\Plugins\Hook;
 use App\Services\FieldValuesPresenter;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -29,7 +30,7 @@ class PageResource extends JsonResource
 
         $presenter = app(FieldValuesPresenter::class);
 
-        return [
+        $data = [
             'id' => $this->id,
             'title' => $this->title,
             'content' => $shouldHideContent
@@ -44,5 +45,7 @@ class PageResource extends JsonResource
             'is_password_protected' => $isProtected,
             'is_preview' => $isPreview,
         ];
+
+        return Hook::applyFilters('page.api', $data, $this->resource, $request);
     }
 }
