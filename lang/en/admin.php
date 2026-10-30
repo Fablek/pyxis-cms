@@ -8,6 +8,7 @@ return [
             'publish' => 'Publishing & Visibility',
             'attributes' => 'Page Attributes',
             'content' => 'Page Content',
+            'seo' => 'SEO',
         ],
         'fields' => [
             'title' => 'Title',
@@ -19,6 +20,10 @@ return [
             'parent' => 'Parent Page',
             'author' => 'Author',
             'content_draft' => 'Page Content',
+            'seo_title' => 'SEO title',
+            'seo_description' => 'SEO description',
+            'seo_og_image' => 'Share image',
+            'seo_noindex' => 'Hide from search engines',
         ],
         'status' => [
             'draft' => 'Draft',
@@ -50,6 +55,12 @@ return [
         ],
         'placeholders' => [
             'none_root' => 'None (Root page)',
+        ],
+        'helpers' => [
+            'seo_title' => 'Recommended up to 60 characters. Empty – the page title is used.',
+            'seo_description' => 'Recommended up to 160 characters. Shown in search results.',
+            'seo_og_image' => 'Image shown when the page is shared (Open Graph), e.g. 1200×630 px.',
+            'seo_noindex' => 'Search engines will not index this page.',
         ],
     ],
     'nav' => [

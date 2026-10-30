@@ -8,6 +8,7 @@ return [
             'publish' => 'Publikacja i widoczność',
             'attributes' => 'Atrybuty strony',
             'content' => 'Treść strony',
+            'seo' => 'SEO',
         ],
         'fields' => [
             'title' => 'Tytuł',
@@ -19,6 +20,10 @@ return [
             'parent' => 'Strona nadrzędna',
             'author' => 'Autor',
             'content_draft' => 'Treść strony',
+            'seo_title' => 'Tytuł SEO',
+            'seo_description' => 'Opis SEO',
+            'seo_og_image' => 'Obrazek udostępniania',
+            'seo_noindex' => 'Ukryj przed wyszukiwarkami',
         ],
         'status' => [
             'draft' => 'Szkic',
@@ -50,6 +55,12 @@ return [
         ],
         'placeholders' => [
             'none_root' => 'Brak (Strona główna)',
+        ],
+        'helpers' => [
+            'seo_title' => 'Zalecane do 60 znaków. Puste – zostanie użyty tytuł strony.',
+            'seo_description' => 'Zalecane do 160 znaków. Pokazywany w wynikach wyszukiwania.',
+            'seo_og_image' => 'Obrazek wyświetlany przy udostępnianiu strony (Open Graph), np. 1200×630 px.',
+            'seo_noindex' => 'Wyszukiwarki nie będą indeksować tej strony.',
         ],
     ],
     'nav' => [
