@@ -3,6 +3,8 @@
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\File;
 use Tests\TestCase;
+use App\Models\Media;
+use Illuminate\Support\Facades\Storage;
 
 /*
 |--------------------------------------------------------------------------
@@ -126,4 +128,22 @@ function makePluginFile(string $slug, string $code): void
 {
     makePlugin($slug, ['name' => $slug, 'slug' => $slug, 'version' => '1.0.0']);
     File::put(config('pyxis.plugins.path')."/{$slug}/plugin.php", "<?php\n\n{$code}\n");
+}
+
+function storedImage(string $name, string $alt): Media
+{
+    Storage::disk('public')->put("media/{$name}.jpg", 'image');
+
+    return Media::create([
+        'disk' => 'public',
+        'directory' => 'media',
+        'visibility' => 'public',
+        'name' => $name,
+        'path' => "media/{$name}.jpg",
+        'type' => 'image/jpeg',
+        'ext' => 'jpg',
+        'alt' => $alt,
+        'width' => 1920,
+        'height' => 1080,
+    ]);
 }

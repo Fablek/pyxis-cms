@@ -90,12 +90,13 @@ it('copies draft field values to the published fields on publish', function () {
 });
 
 it('copies the draft seo to the published seo on publish', function () {
-    $page = Page::factory()->create(['seo_draft' => ['title' => 'Tytuł SEO']]);
+    $page = Page::factory()->create();
 
     Livewire::test(EditPage::class, ['record' => $page->getRouteKey()])
+        ->fillForm(['seo_draft' => ['title' => 'Tytuł SEO']])
         ->callAction(TestAction::make('publish')->schemaComponent('pageActions'));
 
-    expect($page->fresh()->seo)->toBe(['title' => 'Tytuł SEO']);
+    expect($page->fresh()->seo)->toMatchArray(['title' => 'Tytuł SEO']);
 });
 
 it('offers block groups in the content builder instead of static sections', function () {
@@ -144,4 +145,17 @@ it('runs the page.published action on publish', function () {
         ->callAction(TestAction::make('publish')->schemaComponent('pageActions'));
 
     expect($published)->toBe([$page->id]);
+});
+
+it('saves seo to the draft only', function () {
+    $page = Page::factory()->create();
+
+    Livewire::test(EditPage::class, ['record' => $page->getRouteKey()])
+        ->fillForm(['seo_draft' => ['title' => 'Tytuł SEO', 'description' => 'Opis', 'noindex' => true]])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    expect($page->fresh())
+        ->seo_draft->toMatchArray(['title' => 'Tytuł SEO', 'description' => 'Opis', 'noindex' => true])
+        ->seo->toBeNull();
 });
