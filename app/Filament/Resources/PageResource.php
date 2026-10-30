@@ -9,6 +9,7 @@ use App\Filament\CustomFields\PageFieldsForm;
 use App\Filament\CustomFields\PageContentBuilder;
 use App\Models\Page;
 use App\Models\Setting;
+use App\Plugins\Hook;
 use App\Services\PageService;
 use App\Services\FrontendRevalidator;
 use Filament\Actions\Action;
@@ -177,6 +178,8 @@ class PageResource extends Resource
                                         ]);
                                     
                                         app(FrontendRevalidator::class)->revalidate($record);
+
+                                        Hook::doAction('page.published', $record);
 
                                         \Filament\Notifications\Notification::make()
                                             ->title(__('admin.pages.notifications.published'))

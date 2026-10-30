@@ -1,5 +1,9 @@
 <?php
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\File;
+use Tests\TestCase;
+
 /*
 |--------------------------------------------------------------------------
 | Test Case
@@ -11,8 +15,8 @@
 |
 */
 
-pest()->extend(Tests\TestCase::class)
-    ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
+pest()->extend(TestCase::class)
+    ->use(RefreshDatabase::class)
     ->beforeEach(fn () => cache()->flush())
     ->in('Feature');
 
@@ -42,7 +46,84 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
+/**
+ * Points the plugins path at a fresh temporary directory and returns it.
+ */
+function usePluginsDirectory(): string
 {
-    // ..
+    $path = storage_path('framework/testing/plugins-'.uniqid());
+    File::makeDirectory($path, recursive: true);
+    config(['pyxis.plugins.path' => $path]);
+
+    return $path;
+}
+
+/**
+ * Builds a ZIP archive from a map of entry names to contents and returns its path.
+ *
+ * @param  array<string, string>  $files
+ */
+function makePluginArchive(array $files): string
+{
+    $path = config('pyxis.plugins.path').'/plugin-'.uniqid().'.zip';
+    $zip = new ZipArchive;
+    $zip->open($path, ZipArchive::CREATE);
+
+    foreach ($files as $name => $contents) {
+        $zip->addFromString($name, $contents);
+    }
+
+    $zip->close();
+
+    return $path;
+}
+
+/**
+ * Adds a migration creating the given table to a plugin.
+ */
+function makePluginMigration(string $slug, string $table): void
+{
+    $path = config('pyxis.plugins.path')."/{$slug}/database/migrations";
+    File::makeDirectory($path, recursive: true);
+    File::put("{$path}/2026_01_01_000000_create_{$table}_table.php", <<<PHP
+        <?php
+
+        use Illuminate\\Database\\Migrations\\Migration;
+        use Illuminate\\Database\\Schema\\Blueprint;
+        use Illuminate\\Support\\Facades\\Schema;
+
+        return new class extends Migration
+        {
+            public function up(): void
+            {
+                Schema::create('{$table}', function (Blueprint \$table) {
+                    \$table->id();
+                });
+            }
+
+            public function down(): void
+            {
+                Schema::dropIfExists('{$table}');
+            }
+        };
+        PHP);
+}
+
+/**
+ * Creates a plugin directory with the given plugin.json (array or raw string).
+ */
+function makePlugin(string $directory, array|string $manifest): void
+{
+    $path = config('pyxis.plugins.path').'/'.$directory;
+    File::makeDirectory($path, recursive: true);
+    File::put($path.'/plugin.json', is_array($manifest) ? json_encode($manifest) : $manifest);
+}
+
+/**
+ * Creates a plugin with a valid manifest and a plugin.php containing the given code.
+ */
+function makePluginFile(string $slug, string $code): void
+{
+    makePlugin($slug, ['name' => $slug, 'slug' => $slug, 'version' => '1.0.0']);
+    File::put(config('pyxis.plugins.path')."/{$slug}/plugin.php", "<?php\n\n{$code}\n");
 }

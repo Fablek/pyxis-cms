@@ -280,4 +280,36 @@ return [
             'new_tab' => 'Otwórz w nowej karcie',
         ],
     ],
+    'plugins' => [
+        'label' => 'Wtyczka',
+        'plural_label' => 'Wtyczki',
+        'nav_label' => 'Wtyczki',
+        'fields' => [
+            'name' => 'Nazwa',
+            'version' => 'Wersja',
+            'author' => 'Autor',
+            'is_active' => 'Aktywna',
+            'error' => 'Błąd',
+            'archive' => 'Archiwum ZIP',
+            'delete_data' => 'Usuń też dane wtyczki',
+        ],
+        'actions' => [
+            'activate' => 'Włącz',
+            'deactivate' => 'Wyłącz',
+            'upload' => 'Wgraj wtyczkę',
+        ],
+        'notifications' => [
+            'activated' => 'Wtyczka została włączona.',
+            'activation_failed' => 'Nie udało się włączyć wtyczki.',
+            'deactivated' => 'Wtyczka została wyłączona.',
+            'install_failed' => 'Nie udało się zainstalować wtyczki.',
+            'installed' => 'Zainstalowano wtyczkę „:name”. Włącz ją, aby zaczęła działać.',
+        ],
+        'errors' => [
+            'invalid_archive' => 'Plik nie jest poprawnym archiwum ZIP.',
+            'unsafe_archive' => 'Archiwum zawiera niedozwolone ścieżki plików.',
+            'invalid_manifest' => 'Archiwum nie zawiera poprawnego pliku plugin.json.',
+            'already_installed' => 'Wtyczka „:slug” jest już zainstalowana.',
+        ],
+    ],
 ];
