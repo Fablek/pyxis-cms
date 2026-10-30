@@ -18,7 +18,7 @@ return [
     /*
     | Pyxis CMS version shown in the admin panel (bumped on every release)
     */
-    'version' => '1.4.0',
+    'version' => '1.5.0',
 
     /*
     |--------------------------------------------------------------------------
