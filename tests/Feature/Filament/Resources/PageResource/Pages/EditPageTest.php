@@ -11,6 +11,11 @@ use Filament\Forms\Components\Builder;
 use Illuminate\Support\Facades\Http;
 use Livewire\Features\SupportTesting\Testable;
 use Livewire\Livewire;
+use App\Ai\Agents\SeoWriter;
+use App\Models\Setting;
+use App\Services\AiSettings;
+use Laravel\Ai\Prompts\AgentPrompt;
+use Laravel\Ai\Exceptions\ProviderOverloadedException;
 
 beforeEach(function () {
     $this->actingAs(User::factory()->create());
@@ -158,4 +163,73 @@ it('saves seo to the draft only', function () {
     expect($page->fresh())
         ->seo_draft->toMatchArray(['title' => 'Tytuł SEO', 'description' => 'Opis', 'noindex' => true])
         ->seo->toBeNull();
+});
+
+function enableAi(): void
+{
+    Setting::set('ai_enabled', true);
+    Setting::set('ai_provider', 'anthropic');
+    Setting::set('ai_model', 'test-model');
+    app(AiSettings::class)->storeApiKey('sk-test-key');
+}
+
+it('hides the seo generation when ai is disabled', function () {
+    $page = Page::factory()->create();
+
+    Livewire::test(EditPage::class, ['record' => $page->getRouteKey()])
+        ->assertDontSee(__('admin.pages.actions.generate_seo'));
+});
+
+it('fills the seo form from the page text without saving it', function () {
+    enableAi();
+    SeoWriter::fake([['title' => 'Tytuł AI', 'description' => 'Opis AI']]);
+    $page = Page::factory()->create(['content_draft' => [['type' => 'hero', 'data' => ['title' => 'Treść bloku']]]]);
+
+    Livewire::test(EditPage::class, ['record' => $page->getRouteKey()])
+        ->callAction(TestAction::make('generateSeo')->schemaComponent('seoActions'))
+        ->assertSchemaStateSet(['seo_draft.title' => 'Tytuł AI', 'seo_draft.description' => 'Opis AI'])
+        ->assertNotified(__('admin.pages.notifications.seo_generated'));
+
+    SeoWriter::assertPrompted(fn (AgentPrompt $prompt): bool => $prompt->contains('Treść bloku')
+        && ! $prompt->contains('hero')
+        && $prompt->model === 'test-model');
+
+    expect($page->fresh()->seo_draft)->toBeNull()
+        ->and(config('ai.providers.anthropic.key'))->toBe('sk-test-key');
+});
+
+it('does not call ai for a page without text', function () {
+    enableAi();
+    SeoWriter::fake();
+    $page = Page::factory()->create(['content_draft' => []]);
+
+    Livewire::test(EditPage::class, ['record' => $page->getRouteKey()])
+        ->callAction(TestAction::make('generateSeo')->schemaComponent('seoActions'))
+        ->assertNotified(__('admin.pages.notifications.seo_no_content'));
+
+    SeoWriter::assertNeverPrompted();
+});
+
+it('keeps the seo form and notifies when the provider fails', function () {
+    enableAi();
+    SeoWriter::fake(fn () => throw new RuntimeException('Provider error'));
+    $page = Page::factory()->create([
+        'content_draft' => [['type' => 'hero', 'data' => ['title' => 'Treść bloku']]],
+        'seo_draft' => ['title' => 'Mój tytuł'],
+    ]);
+
+    Livewire::test(EditPage::class, ['record' => $page->getRouteKey()])
+        ->callAction(TestAction::make('generateSeo')->schemaComponent('seoActions'))
+        ->assertSchemaStateSet(['seo_draft.title' => 'Mój tytuł'])
+        ->assertNotified(__('admin.pages.notifications.seo_failed'));
+});
+
+it('asks to try again later when the provider is overloaded', function () {
+    enableAi();
+    SeoWriter::fake(fn () => throw new ProviderOverloadedException('Overloaded'));
+    $page = Page::factory()->create(['content_draft' => [['type' => 'hero', 'data' => ['title' => 'Treść bloku']]]]);
+
+    Livewire::test(EditPage::class, ['record' => $page->getRouteKey()])
+        ->callAction(TestAction::make('generateSeo')->schemaComponent('seoActions'))
+        ->assertNotified(__('admin.pages.notifications.seo_unavailable'));
 });

@@ -16,6 +16,8 @@ use App\Models\Setting;
 use App\Plugins\Hook;
 use App\Services\PageService;
 use App\Services\FrontendRevalidator;
+use App\Services\AiSettings;
+use App\Services\PageSeoGenerator;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -40,6 +42,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
+use Laravel\Ai\Exceptions\FailoverableException;
 
 class PageResource extends Resource
 {
@@ -224,6 +227,60 @@ class PageResource extends Resource
                     
                     Section::make(__('admin.pages.sections.seo'))
                         ->schema([
+                            Actions::make([
+                                Action::make('generateSeo')
+                                    ->label(__('admin.pages.actions.generate_seo'))
+                                    ->color('gray')
+                                    ->icon('heroicon-o-sparkles')
+                                    ->visible(fn (): bool => app(AiSettings::class)->isEnabled())
+                                    ->requiresConfirmation(fn (Get $get): bool => filled($get('seo_draft.title')) || filled($get('seo_draft.description')))
+                                    ->modalDescription(__('admin.pages.modals.generate_seo_confirm'))
+                                    ->action(function (Get $get, Set $set): void {
+                                        try {
+                                            $seo = app(PageSeoGenerator::class)->generate(
+                                                $get('title'),
+                                                $get('content_draft') ?? [],
+                                                $get('fields_draft') ?? [],
+                                            );
+                                        } catch (FailoverableException $exception) {
+                                            report($exception);
+
+                                            Notification::make()
+                                                ->title(__('admin.pages.notifications.seo_unavailable'))
+                                                ->warning()
+                                                ->send();
+
+                                            return;
+                                        } catch (\Throwable $exception) {
+                                            report($exception);
+
+                                            Notification::make()
+                                                ->title(__('admin.pages.notifications.seo_failed'))
+                                                ->danger()
+                                                ->send();
+
+                                            return;
+                                        }
+
+                                        if ($seo === null) {
+                                            Notification::make()
+                                                ->title(__('admin.pages.notifications.seo_no_content'))
+                                                ->warning()
+                                                ->send();
+
+                                            return;
+                                        }
+
+                                        $set('seo_draft.title', $seo['title']);
+                                        $set('seo_draft.description', $seo['description']);
+
+                                        Notification::make()
+                                            ->title(__('admin.pages.notifications.seo_generated'))
+                                            ->success()
+                                            ->send();
+                                    }),
+                            ])->key('seoActions'),
+
                             TextInput::make('seo_draft.title')
                                 ->label(__('admin.pages.fields.seo_title'))
                                 ->placeholder(fn (Get $get): ?string => $get('title'))

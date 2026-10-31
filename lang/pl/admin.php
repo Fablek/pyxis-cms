@@ -45,13 +45,19 @@ return [
             'create' => 'Utwórz',
             'create_another' => 'Utwórz i utwórz kolejny',
             'add_block' => 'Dodaj blok',
+            'generate_seo' => 'Generuj z treści',
         ],
         'modals' => [
             'delete_confirm' => 'Czy na pewno chcesz usunąć tę stronę?',
             'publish_confirm' => 'Ta akcja nadpisze publiczną wersję strony aktualnym szkicem. Kontynuować?',
+            'generate_seo_confirm' => 'Obecny tytuł i opis SEO zostaną zastąpione. Zmiany zapiszą się dopiero po zapisaniu szkicu.',
         ],
         'notifications' => [
             'published' => 'Strona została pomyślnie opublikowana!',
+            'seo_generated' => 'Wygenerowano SEO. Sprawdź je i zapisz szkic.',
+            'seo_failed' => 'Nie udało się wygenerować SEO. Sprawdź ustawienia AI i spróbuj ponownie.',
+            'seo_unavailable' => 'Dostawca AI jest chwilowo niedostępny lub wyczerpano limit. Spróbuj ponownie później.',
+            'seo_no_content' => 'Strona nie ma jeszcze treści, z której można wygenerować SEO.',
         ],
         'placeholders' => [
             'none_root' => 'Brak (Strona główna)',

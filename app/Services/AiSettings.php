@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Setting;
 use Illuminate\Support\Facades\Crypt;
+use Laravel\Ai\Ai;
 
 class AiSettings
 {
@@ -58,5 +59,17 @@ class AiSettings
     public function storeApiKey(string $apiKey): void
     {
         Setting::set('ai_api_key', Crypt::encryptString($apiKey));
+    }
+
+    /**
+     * Hands the stored key to the SDK, which otherwise reads provider keys from config files.
+     */
+    public function configureProvider(): void
+    {
+        $provider = $this->provider();
+
+        config(["ai.providers.{$provider}.key" => $this->apiKey()]);
+
+        Ai::purge($provider);
     }
 }

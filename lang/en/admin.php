@@ -45,13 +45,19 @@ return [
             'create' => 'Create',
             'create_another' => 'Create and create another',
             'add_block' => 'Add block',
+            'generate_seo' => 'Generate from content',
         ],
         'modals' => [
             'delete_confirm' => 'Are you sure you want to delete this page?',
             'publish_confirm' => 'This will overwrite the public version with your current draft. Continue?',
+            'generate_seo_confirm' => 'The current SEO title and description will be replaced. Nothing is stored until you save the draft.',
         ],
         'notifications' => [
             'published' => 'The page has been successfully published!',
+            'seo_generated' => 'SEO generated. Review it and save the draft.',
+            'seo_failed' => 'Could not generate SEO. Check the AI settings and try again.',
+            'seo_unavailable' => 'The AI provider is temporarily unavailable or the limit has been reached. Try again later.',
+            'seo_no_content' => 'The page has no content to generate SEO from yet.',
         ],
         'placeholders' => [
             'none_root' => 'None (Root page)',
