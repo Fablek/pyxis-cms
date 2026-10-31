@@ -97,15 +97,27 @@ return [
         'sections' => [
             'config' => 'Main Configuration',
             'config_desc' => 'Manage core site parameters, such as the default language and the homepage.',
+            'ai' => 'Artificial intelligence',
+            'ai_desc' => 'The provider and API key used by the AI features in the panel.',
         ],
 
         'fields' => [
             'language' => 'Site Language',
             'homepage' => 'Main Homepage',
+            'ai_enabled' => 'Enable AI features',
+            'ai_provider' => 'Provider',
+            'ai_model' => 'Model',
+            'ai_api_key' => 'API key',
         ],
 
         'placeholders' => [
             'select_page' => 'Select a page from the list...',
+            'ai_model' => 'The provider\'s default model',
+        ],
+
+        'helpers' => [
+            'ai_api_key' => 'The key is stored encrypted in the database.',
+            'ai_api_key_saved' => 'A key is saved. Leave this field empty to keep it.',
         ],
     ],
     'media' => [

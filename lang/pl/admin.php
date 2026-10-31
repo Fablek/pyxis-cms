@@ -97,59 +97,27 @@ return [
         'sections' => [
             'config' => 'Główna konfiguracja',
             'config_desc' => 'Zarządzaj podstawowymi parametrami strony, takimi jak język domyślny i strona główna.',
+            'ai' => 'Sztuczna inteligencja',
+            'ai_desc' => 'Dostawca i klucz API używane przez funkcje AI w panelu.',
         ],
 
         'fields' => [
             'language' => 'Język strony',
             'homepage' => 'Strona główna',
+            'ai_enabled' => 'Włącz funkcje AI',
+            'ai_provider' => 'Dostawca',
+            'ai_model' => 'Model',
+            'ai_api_key' => 'Klucz API',
         ],
 
         'placeholders' => [
             'select_page' => 'Wybierz stronę z listy...',
-        ],
-    ],
-    'nav' => [
-        'users' => 'Użytkownicy',
-        'settings' => 'Ustawienia',
-        'pages' => 'Strony',
-    ],
-    'users' => [
-        'label' => 'Użytkownik',
-        'plural_label' => 'Użytkownicy',
-        'sections' => [
-            'basic_data' => 'Dane podstawowe',
-            'security' => 'Bezpieczeństwo',
-        ],
-        'fields' => [
-            'name' => 'Imię i nazwisko',
-            'email' => 'Adres e-mail',
-            'role' => 'Rola systemowa',
-            'password' => 'Hasło',
-            'created_at' => 'Data utworzenia',
-        ],
-    ],
-    'roles' => [
-        'admin' => 'Administrator',
-        'editor' => 'Redaktor',
-    ],
-    'settings' => [
-        'navigation_label' => 'Ustawienia',
-        'title' => 'Ustawienia systemu',
-        'save_button' => 'Zapisz zmiany',
-        'notification_success' => 'Ustawienia zostały pomyślnie zapisane.',
-
-        'sections' => [
-            'config' => 'Konfiguracja główna',
-            'config_desc' => 'Zarządzaj podstawowymi parametrami witryny, takimi jak język domyślny oraz strona główna.',
+            'ai_model' => 'Domyślny model dostawcy',
         ],
 
-        'fields' => [
-            'language' => 'Język witryny',
-            'homepage' => 'Strona główna serwisu',
-        ],
-
-        'placeholders' => [
-            'select_page' => 'Wybierz stronę z listy...',
+        'helpers' => [
+            'ai_api_key' => 'Klucz jest przechowywany w bazie w postaci zaszyfrowanej.',
+            'ai_api_key_saved' => 'Klucz jest zapisany. Zostaw pole puste, aby go nie zmieniać.',
         ],
     ],
     'media' => [
