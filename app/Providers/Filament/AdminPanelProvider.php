@@ -21,6 +21,11 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Filament\Support\Facades\FilamentView;
 use Illuminate\Support\Facades\Blade;
 use Awcodes\Curator\CuratorPlugin;
+use App\Filament\Resources\PageResource\Pages\CreatePage;
+use App\Filament\Resources\PageResource\Pages\EditPage;
+use App\Livewire\AiAssistant;
+use App\Services\AiSettings;
+use Filament\View\PanelsRenderHook;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -94,6 +99,13 @@ class AdminPanelProvider extends PanelProvider
                         ]
                     );
                 }
+            )
+            ->renderHook(
+                PanelsRenderHook::BODY_END,
+                fn (): string => app(AiSettings::class)->isEnabled()
+                    ? Blade::render('@livewire($component)', ['component' => AiAssistant::class])
+                    : '',
+                scopes: [EditPage::class, CreatePage::class],
             )
             ->plugins([
                 \Awcodes\Curator\CuratorPlugin::make()

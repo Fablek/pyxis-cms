@@ -253,3 +253,13 @@ body {
         }
     }
 }
+
+
+/* --- AI ASSISTANT --- */
+
+/* Keep the whole form visible next to the assistant panel */
+@media (min-width: 1024px) {
+    html.ai-assistant-open .fi-main-ctn {
+        padding-right: 24rem;
+    }
+}

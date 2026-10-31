@@ -199,6 +199,18 @@ return [
             'empty' => 'No fields to display. Add a field and fill in its name.',
         ],
     ],
+    'ai_assistant' => [
+        'title' => 'AI assistant',
+        'close' => 'Close the assistant',
+        'empty' => 'Tell me how I can help with this page.',
+        'placeholder' => 'What should I do?',
+        'send' => 'Send',
+        'thinking' => 'The assistant is writing...',
+        'errors' => [
+            'unavailable' => 'The AI provider is temporarily unavailable or the limit has been reached. Try again later.',
+            'failed' => 'Could not get a reply. Check the AI settings and try again.',
+        ],
+    ],
     'custom_fields' => [
         'tabs' => [
             'general' => 'General',

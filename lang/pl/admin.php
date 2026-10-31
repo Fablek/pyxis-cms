@@ -199,6 +199,18 @@ return [
             'empty' => 'Brak pól do wyświetlenia. Dodaj pole i uzupełnij jego nazwę.',
         ],
     ],
+    'ai_assistant' => [
+        'title' => 'Asystent AI',
+        'close' => 'Zamknij asystenta',
+        'empty' => 'Napisz, w czym mogę pomóc przy tej stronie.',
+        'placeholder' => 'Co mam zrobić?',
+        'send' => 'Wyślij',
+        'thinking' => 'Asystent pisze...',
+        'errors' => [
+            'unavailable' => 'Dostawca AI jest chwilowo niedostępny lub wyczerpano limit. Spróbuj ponownie później.',
+            'failed' => 'Nie udało się uzyskać odpowiedzi. Sprawdź ustawienia AI i spróbuj ponownie.',
+        ],
+    ],
     'custom_fields' => [
         'tabs' => [
             'general' => 'Ogólne',
