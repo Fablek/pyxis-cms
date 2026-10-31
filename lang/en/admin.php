@@ -206,6 +206,11 @@ return [
         'placeholder' => 'What should I do?',
         'send' => 'Send',
         'thinking' => 'The assistant is writing...',
+        'before' => 'Before',
+        'after' => 'After',
+        'apply' => 'Apply',
+        'reject' => 'Reject',
+        'apply_all' => 'Apply all',
         'errors' => [
             'unavailable' => 'The AI provider is temporarily unavailable or the limit has been reached. Try again later.',
             'failed' => 'Could not get a reply. Check the AI settings and try again.',

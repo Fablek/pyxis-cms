@@ -233,3 +233,53 @@ it('asks to try again later when the provider is overloaded', function () {
         ->callAction(TestAction::make('generateSeo')->schemaComponent('seoActions'))
         ->assertNotified(__('admin.pages.notifications.seo_unavailable'));
 });
+
+it('gives the assistant only the text fields of the content and seo', function () {
+    $page = Page::factory()->create(['title' => 'O nas', 'fields_draft' => ['hero' => ['title' => 'Witaj']]]);
+    heroGroupFor('page', $page->id);
+
+    Livewire::test(EditPage::class, ['record' => $page->getRouteKey()])
+        ->fillForm(['title' => 'O nas (zmiana)'])
+        ->call('provideAiAssistantFields')
+        ->assertDispatched('ai-assistant-fields-provided', function (string $event, array $params): bool {
+            $fields = collect($params['fields'])->keyBy('path');
+
+            return $fields['data.title']['value'] === 'O nas (zmiana)'
+                && $fields['data.fields_draft.hero.title']['value'] === 'Witaj'
+                && $fields['data.fields_draft.hero.title']['label'] === 'Nagłówek'
+                && $fields->has('data.seo_draft.description')
+                && ! $fields->has('data.slug')
+                && ! $fields->has('data.password');
+        });
+});
+
+it('writes an accepted change to the form without saving it', function () {
+    $page = Page::factory()->create(['fields_draft' => ['hero' => ['title' => 'Witaj']]]);
+    heroGroupFor('page', $page->id);
+
+    Livewire::test(EditPage::class, ['record' => $page->getRouteKey()])
+        ->call('applyAiAssistantChange', 'data.fields_draft.hero.title', 'Hello')
+        ->assertSchemaStateSet(['fields_draft.hero.title' => 'Hello']);
+
+    expect($page->fresh()->fields_draft)->toBe(['hero' => ['title' => 'Witaj']]);
+});
+
+it('keeps the formatting of an accepted rich text change', function () {
+    $page = Page::factory()->create(['fields_draft' => ['hero' => ['body' => '<p>Witaj</p>']]]);
+    heroGroupFor('page', $page->id)->update(['fields' => [['type' => 'wysiwyg', 'label' => 'Treść', 'name' => 'body']]]);
+
+    Livewire::test(EditPage::class, ['record' => $page->getRouteKey()])
+        ->call('applyAiAssistantChange', 'data.fields_draft.hero.body', '<p><strong>Hello</strong></p>')
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    expect($page->fresh()->fields_draft['hero']['body'])->toContain('<strong>Hello</strong>');
+});
+
+it('ignores an accepted change of a field outside the assistant reach', function () {
+    $page = Page::factory()->create(['slug' => 'o-nas']);
+
+    Livewire::test(EditPage::class, ['record' => $page->getRouteKey()])
+        ->call('applyAiAssistantChange', 'data.slug', 'hacked')
+        ->assertSchemaStateSet(['slug' => 'o-nas']);
+});

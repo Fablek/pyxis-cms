@@ -206,6 +206,11 @@ return [
         'placeholder' => 'Co mam zrobić?',
         'send' => 'Wyślij',
         'thinking' => 'Asystent pisze...',
+        'before' => 'Było',
+        'after' => 'Będzie',
+        'apply' => 'Zastosuj',
+        'reject' => 'Odrzuć',
+        'apply_all' => 'Zastosuj wszystkie',
         'errors' => [
             'unavailable' => 'Dostawca AI jest chwilowo niedostępny lub wyczerpano limit. Spróbuj ponownie później.',
             'failed' => 'Nie udało się uzyskać odpowiedzi. Sprawdź ustawienia AI i spróbuj ponownie.',

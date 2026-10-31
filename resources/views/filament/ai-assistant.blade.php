@@ -42,9 +42,39 @@
             >{{ $message['content'] }}</div>
         @endforeach
 
-        <p wire:loading wire:target="reply" class="text-gray-500 dark:text-gray-400">
-            {{ __('admin.ai_assistant.thinking') }}
-        </p>
+        @foreach ($proposals as $index => $proposal)
+            <div wire:key="ai-proposal-{{ $proposal['path'] }}" class="rounded-lg border border-gray-200 p-3 dark:border-white/10">
+                <p class="font-semibold text-gray-900 dark:text-white">{{ $proposal['label'] }}</p>
+
+                @if (filled($proposal['before']))
+                    <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">{{ __('admin.ai_assistant.before') }}</p>
+                    <p class="whitespace-pre-wrap text-gray-500 line-through dark:text-gray-400">{{ strip_tags($proposal['before']) }}</p>
+                @endif
+
+                <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">{{ __('admin.ai_assistant.after') }}</p>
+                <p class="whitespace-pre-wrap text-gray-900 dark:text-white">{{ strip_tags($proposal['after']) }}</p>
+
+                <div class="mt-3 flex gap-2">
+                    <x-filament::button size="xs" wire:click="applyProposal({{ $index }})">
+                        {{ __('admin.ai_assistant.apply') }}
+                    </x-filament::button>
+
+                    <x-filament::button size="xs" color="gray" wire:click="rejectProposal({{ $index }})">
+                        {{ __('admin.ai_assistant.reject') }}
+                    </x-filament::button>
+                </div>
+            </div>
+        @endforeach
+
+        @if (count($proposals) > 1)
+            <x-filament::button size="sm" class="self-start" wire:click="applyAllProposals">
+                {{ __('admin.ai_assistant.apply_all') }}
+            </x-filament::button>
+        @endif
+
+        @if ($isWaitingForReply)
+            <p class="text-gray-500 dark:text-gray-400">{{ __('admin.ai_assistant.thinking') }}</p>
+        @endif
 
         @if ($error)
             <p role="alert" class="text-danger-600 dark:text-danger-400">{{ $error }}</p>
@@ -67,7 +97,7 @@
         @enderror
 
         <div class="mt-2 flex justify-end">
-            <x-filament::button type="submit" size="sm" wire:loading.attr="disabled" wire:target="send, reply">
+            <x-filament::button type="submit" size="sm" :disabled="$isWaitingForReply">
                 {{ __('admin.ai_assistant.send') }}
             </x-filament::button>
         </div>

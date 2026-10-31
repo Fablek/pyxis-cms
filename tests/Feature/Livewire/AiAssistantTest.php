@@ -19,6 +19,19 @@ function enableAiAssistant(): void
     app(AiSettings::class)->storeApiKey('sk-test-key');
 }
 
+/**
+ * @return array<int, array{path: string, label: string, type: string, value: string}>
+ */
+function assistantFields(): array
+{
+    return [['path' => 'data.title', 'label' => 'Tytuł', 'type' => 'text', 'value' => 'O nas']];
+}
+
+function assistantReply(array $changes = []): array
+{
+    return ['message' => 'Gotowe', 'changes' => $changes];
+}
+
 it('shows the assistant on the page form when ai is enabled', function () {
     enableAiAssistant();
     $this->withoutVite()->actingAs(User::factory()->create());
@@ -45,43 +58,111 @@ it('does not show the assistant when ai is disabled', function () {
         ->assertDontSee("\$dispatch('ai-assistant-toggle')", false);
 });
 
-it('replies and sends the earlier messages to the provider', function () {
+it('asks the page form for its fields after a message', function () {
     enableAiAssistant();
     $this->actingAs(User::factory()->create());
-    PageAssistant::fake(['Pierwsza odpowiedź', 'Druga odpowiedź']);
+
+    Livewire::test(AiAssistant::class)
+        ->set('prompt', 'Pytanie')
+        ->call('send')
+        ->assertSet('prompt', '')
+        ->assertSet('isWaitingForReply', true)
+        ->assertDispatched('ai-assistant-fields-requested');
+});
+
+it('sends the fields and the earlier messages to the provider', function () {
+    enableAiAssistant();
+    $this->actingAs(User::factory()->create());
+    PageAssistant::fake([assistantReply(), assistantReply()]);
 
     Livewire::test(AiAssistant::class)
         ->set('prompt', 'Pierwsze pytanie')
         ->call('send')
-        ->assertSet('prompt', '')
-        ->call('reply')
+        ->call('reply', assistantFields())
         ->set('prompt', 'Drugie pytanie')
         ->call('send')
-        ->call('reply')
+        ->call('reply', assistantFields())
+        ->assertSet('isWaitingForReply', false)
         ->assertSet('messages', [
             ['role' => 'user', 'content' => 'Pierwsze pytanie'],
-            ['role' => 'assistant', 'content' => 'Pierwsza odpowiedź'],
+            ['role' => 'assistant', 'content' => 'Gotowe'],
             ['role' => 'user', 'content' => 'Drugie pytanie'],
-            ['role' => 'assistant', 'content' => 'Druga odpowiedź'],
+            ['role' => 'assistant', 'content' => 'Gotowe'],
         ]);
 
     PageAssistant::assertPrompted(fn (AgentPrompt $prompt): bool => $prompt->contains('Drugie pytanie')
+        && $prompt->contains('O nas')
         && $prompt->model === 'test-model'
-        && collect($prompt->messages)->pluck('content')->all() === ['Pierwsze pytanie', 'Pierwsza odpowiedź']);
+        && collect($prompt->messages)->pluck('content')->all() === ['Pierwsze pytanie', 'Gotowe']);
 });
 
-it('rejects an empty message without calling the provider', function () {
+it('turns the changes into proposals with the previous value', function () {
     enableAiAssistant();
     $this->actingAs(User::factory()->create());
-    PageAssistant::fake();
+    PageAssistant::fake([assistantReply([['path' => 'data.title', 'value' => 'About us']])]);
+
+    Livewire::test(AiAssistant::class)
+        ->set('prompt', 'Przetłumacz')
+        ->call('send')
+        ->call('reply', assistantFields())
+        ->assertSet('proposals', [
+            ['path' => 'data.title', 'label' => 'Tytuł', 'before' => 'O nas', 'after' => 'About us'],
+        ]);
+});
+
+it('drops changes of unknown fields and unchanged values', function () {
+    enableAiAssistant();
+    $this->actingAs(User::factory()->create());
+    PageAssistant::fake([assistantReply([
+        ['path' => 'data.status', 'value' => 'published'],
+        ['path' => 'data.title', 'value' => 'O nas'],
+    ])]);
+
+    Livewire::test(AiAssistant::class)
+        ->set('prompt', 'Opublikuj')
+        ->call('send')
+        ->call('reply', assistantFields())
+        ->assertSet('proposals', []);
+});
+
+it('hands an accepted proposal to the form and removes it', function () {
+    enableAiAssistant();
+    $this->actingAs(User::factory()->create());
+    PageAssistant::fake([assistantReply([['path' => 'data.title', 'value' => 'About us']])]);
+
+    Livewire::test(AiAssistant::class)
+        ->set('prompt', 'Przetłumacz')
+        ->call('send')
+        ->call('reply', assistantFields())
+        ->call('applyProposal', 0)
+        ->assertDispatched('ai-assistant-change-accepted', path: 'data.title', value: 'About us')
+        ->assertSet('proposals', []);
+});
+
+it('removes a rejected proposal without changing the form', function () {
+    enableAiAssistant();
+    $this->actingAs(User::factory()->create());
+    PageAssistant::fake([assistantReply([['path' => 'data.title', 'value' => 'About us']])]);
+
+    Livewire::test(AiAssistant::class)
+        ->set('prompt', 'Przetłumacz')
+        ->call('send')
+        ->call('reply', assistantFields())
+        ->call('rejectProposal', 0)
+        ->assertNotDispatched('ai-assistant-change-accepted')
+        ->assertSet('proposals', []);
+});
+
+it('rejects an empty message without asking for the fields', function () {
+    enableAiAssistant();
+    $this->actingAs(User::factory()->create());
 
     Livewire::test(AiAssistant::class)
         ->set('prompt', '')
         ->call('send')
         ->assertHasErrors(['prompt' => 'required'])
+        ->assertNotDispatched('ai-assistant-fields-requested')
         ->assertSet('messages', []);
-
-    PageAssistant::assertNeverPrompted();
 });
 
 it('shows a retry message when the provider is overloaded', function () {
@@ -92,7 +173,8 @@ it('shows a retry message when the provider is overloaded', function () {
     Livewire::test(AiAssistant::class)
         ->set('prompt', 'Pytanie')
         ->call('send')
-        ->call('reply')
+        ->call('reply', assistantFields())
+        ->assertSet('isWaitingForReply', false)
         ->assertSet('error', __('admin.ai_assistant.errors.unavailable'));
 });
 
@@ -104,7 +186,7 @@ it('shows a settings message when the provider call fails', function () {
     Livewire::test(AiAssistant::class)
         ->set('prompt', 'Pytanie')
         ->call('send')
-        ->call('reply')
+        ->call('reply', assistantFields())
         ->assertSet('error', __('admin.ai_assistant.errors.failed'));
 });
 
