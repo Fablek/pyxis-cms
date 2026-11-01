@@ -8,10 +8,10 @@ use App\Models\Page;
 use App\Models\Setting;
 use App\Models\User;
 use App\Services\AiSettings;
+use Illuminate\Support\Facades\Lang;
 use Laravel\Ai\Exceptions\ProviderOverloadedException;
 use Laravel\Ai\Prompts\AgentPrompt;
 use Livewire\Livewire;
-use Illuminate\Support\Facades\Lang;
 
 function enableAiAssistant(): void
 {
