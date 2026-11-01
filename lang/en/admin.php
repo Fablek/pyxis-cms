@@ -97,15 +97,27 @@ return [
         'sections' => [
             'config' => 'Main Configuration',
             'config_desc' => 'Manage core site parameters, such as the default language and the homepage.',
+            'ai' => 'Artificial intelligence',
+            'ai_desc' => 'The provider and API key used by the AI features in the panel.',
         ],
 
         'fields' => [
             'language' => 'Site Language',
             'homepage' => 'Main Homepage',
+            'ai_enabled' => 'Enable AI features',
+            'ai_provider' => 'Provider',
+            'ai_model' => 'Model',
+            'ai_api_key' => 'API key',
         ],
 
         'placeholders' => [
             'select_page' => 'Select a page from the list...',
+            'ai_model' => 'The provider\'s default model',
+        ],
+
+        'helpers' => [
+            'ai_api_key' => 'The key is stored encrypted in the database.',
+            'ai_api_key_saved' => 'A key is saved. Leave this field empty to keep it.',
         ],
     ],
     'media' => [
@@ -179,6 +191,34 @@ return [
             'description' => 'This is how editors will see these fields while editing a page. Values are not saved.',
             'close' => 'Close',
             'empty' => 'No fields to display. Add a field and fill in its name.',
+        ],
+    ],
+    'ai_assistant' => [
+        'title' => 'AI assistant',
+        'close' => 'Close the assistant',
+        'empty' => 'Tell me how I can help with this page.',
+        'placeholder' => 'What should I do?',
+        'send' => 'Send',
+        'thinking' => 'The assistant is writing...',
+        'before' => 'Before',
+        'after' => 'After',
+        'apply' => 'Apply',
+        'reject' => 'Reject',
+        'apply_all' => 'Apply all',
+        'new_block' => 'New block: :label',
+        'quick_actions' => [
+            'seo' => ['label' => 'Fill in SEO', 'prompt' => 'Fill in the SEO title and description based on the page content.'],
+            'summary' => ['label' => 'Summarize', 'prompt' => 'Write a short summary of the page content and give it in your reply, without changing any fields.'],
+            'translate_en' => ['label' => 'To English', 'prompt' => 'Translate the page content into English.'],
+            'translate_pl' => ['label' => 'To Polish', 'prompt' => 'Translate the page content into Polish.'],
+            'formal' => ['label' => 'More formal', 'prompt' => 'Rewrite the page content in a more formal style.'],
+            'casual' => ['label' => 'Less formal', 'prompt' => 'Rewrite the page content in a less formal style.'],
+            'shorter' => ['label' => 'Shorten', 'prompt' => 'Shorten the page content, keeping the key information.'],
+            'correct' => ['label' => 'Fix mistakes', 'prompt' => 'Fix the mistakes in the page content, changing nothing else.'],
+        ],
+        'errors' => [
+            'unavailable' => 'The AI provider is temporarily unavailable or the limit has been reached. Try again later.',
+            'failed' => 'Could not get a reply. Check the AI settings and try again.',
         ],
     ],
     'custom_fields' => [
