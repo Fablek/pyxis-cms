@@ -45,19 +45,13 @@ return [
             'create' => 'Create',
             'create_another' => 'Create and create another',
             'add_block' => 'Add block',
-            'generate_seo' => 'Generate from content',
         ],
         'modals' => [
             'delete_confirm' => 'Are you sure you want to delete this page?',
             'publish_confirm' => 'This will overwrite the public version with your current draft. Continue?',
-            'generate_seo_confirm' => 'The current SEO title and description will be replaced. Nothing is stored until you save the draft.',
         ],
         'notifications' => [
             'published' => 'The page has been successfully published!',
-            'seo_generated' => 'SEO generated. Review it and save the draft.',
-            'seo_failed' => 'Could not generate SEO. Check the AI settings and try again.',
-            'seo_unavailable' => 'The AI provider is temporarily unavailable or the limit has been reached. Try again later.',
-            'seo_no_content' => 'The page has no content to generate SEO from yet.',
         ],
         'placeholders' => [
             'none_root' => 'None (Root page)',
@@ -211,6 +205,15 @@ return [
         'apply' => 'Apply',
         'reject' => 'Reject',
         'apply_all' => 'Apply all',
+        'quick_actions' => [
+            'seo' => ['label' => 'Fill in SEO', 'prompt' => 'Fill in the SEO title and description based on the page content.'],
+            'translate_en' => ['label' => 'To English', 'prompt' => 'Translate the page content into English.'],
+            'translate_pl' => ['label' => 'To Polish', 'prompt' => 'Translate the page content into Polish.'],
+            'formal' => ['label' => 'More formal', 'prompt' => 'Rewrite the page content in a more formal style.'],
+            'casual' => ['label' => 'Less formal', 'prompt' => 'Rewrite the page content in a less formal style.'],
+            'shorter' => ['label' => 'Shorten', 'prompt' => 'Shorten the page content, keeping the key information.'],
+            'correct' => ['label' => 'Fix mistakes', 'prompt' => 'Fix the mistakes in the page content, changing nothing else.'],
+        ],
         'errors' => [
             'unavailable' => 'The AI provider is temporarily unavailable or the limit has been reached. Try again later.',
             'failed' => 'Could not get a reply. Check the AI settings and try again.',

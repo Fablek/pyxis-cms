@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Ai\Agents\PageAssistant;
+use App\Models\Setting;
 
 class PageAssistantChat
 {
@@ -22,7 +23,10 @@ class PageAssistantChat
     {
         $this->aiSettings->configureProvider();
 
-        $response = PageAssistant::make()->withMessages(array_slice($history, -self::MAX_HISTORY_MESSAGES))->prompt(
+        $assistant = PageAssistant::make(language: Setting::get('site_language', 'pl'))
+            ->withMessages(array_slice($history, -self::MAX_HISTORY_MESSAGES));
+
+        $response = $assistant->prompt(
             'Page fields: '.json_encode($fields, JSON_UNESCAPED_UNICODE)."\n\nEditor's request: {$prompt}",
             provider: $this->aiSettings->provider(),
             model: $this->aiSettings->model() ?: null,

@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Enums\AssistantQuickAction;
 use App\Services\AiSettings;
 use App\Services\PageAssistantChat;
 use Illuminate\Contracts\View\View;
@@ -43,13 +44,15 @@ class AiAssistant extends Component
         $this->ensureAvailable();
         $this->validate();
 
-        $this->messages[] = ['role' => 'user', 'content' => $this->prompt];
+        $this->startReply($this->prompt);
         $this->prompt = '';
-        $this->proposals = [];
-        $this->error = null;
-        $this->isWaitingForReply = true;
+    }
 
-        $this->dispatch('ai-assistant-fields-requested');
+    public function sendQuickAction(AssistantQuickAction $action): void
+    {
+        $this->ensureAvailable();
+
+        $this->startReply($action->prompt());
     }
 
     /**
@@ -111,6 +114,16 @@ class AiAssistant extends Component
     public function render(): View
     {
         return view('filament.ai-assistant');
+    }
+
+    private function startReply(string $prompt): void
+    {
+        $this->messages[] = ['role' => 'user', 'content' => $prompt];
+        $this->proposals = [];
+        $this->error = null;
+        $this->isWaitingForReply = true;
+
+        $this->dispatch('ai-assistant-fields-requested');
     }
 
     /**

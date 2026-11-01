@@ -82,6 +82,20 @@
     </div>
 
     <form wire:submit="send" class="shrink-0 border-t border-gray-200 p-4 dark:border-white/10">
+        <div class="mb-3 flex flex-wrap gap-2">
+            @foreach (\App\Enums\AssistantQuickAction::cases() as $quickAction)
+                <x-filament::button
+                    size="xs"
+                    color="gray"
+                    wire:key="ai-quick-action-{{ $quickAction->value }}"
+                    wire:click="sendQuickAction('{{ $quickAction->value }}')"
+                    :disabled="$isWaitingForReply"
+                >
+                    {{ $quickAction->label() }}
+                </x-filament::button>
+            @endforeach
+        </div>
+
         <textarea
             wire:model="prompt"
             x-on:keydown.enter="if (! $event.shiftKey) { $event.preventDefault(); $wire.send() }"

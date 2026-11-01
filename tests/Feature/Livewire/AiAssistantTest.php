@@ -1,6 +1,7 @@
 <?php
 
 use App\Ai\Agents\PageAssistant;
+use App\Enums\AssistantQuickAction;
 use App\Filament\Resources\PageResource;
 use App\Livewire\AiAssistant;
 use App\Models\Page;
@@ -188,6 +189,29 @@ it('shows a settings message when the provider call fails', function () {
         ->call('send')
         ->call('reply', assistantFields())
         ->assertSet('error', __('admin.ai_assistant.errors.failed'));
+});
+
+it('sends a quick action as a message', function () {
+    enableAiAssistant();
+    $this->actingAs(User::factory()->create());
+
+    Livewire::test(AiAssistant::class)
+        ->call('sendQuickAction', AssistantQuickAction::SEO->value)
+        ->assertSet('messages', [['role' => 'user', 'content' => AssistantQuickAction::SEO->prompt()]])
+        ->assertDispatched('ai-assistant-fields-requested');
+});
+
+it('tells the provider the site language', function () {
+    enableAiAssistant();
+    Setting::set('site_language', 'en');
+    $this->actingAs(User::factory()->create());
+    PageAssistant::fake([assistantReply()]);
+
+    Livewire::test(AiAssistant::class)
+        ->call('sendQuickAction', AssistantQuickAction::SEO->value)
+        ->call('reply', assistantFields());
+
+    PageAssistant::assertPrompted(fn (AgentPrompt $prompt): bool => str_contains((string) $prompt->agent->instructions(), 'language with the code en'));
 });
 
 it('refuses to send messages when ai is disabled', function () {

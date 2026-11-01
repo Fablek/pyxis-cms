@@ -45,19 +45,13 @@ return [
             'create' => 'Utwórz',
             'create_another' => 'Utwórz i utwórz kolejny',
             'add_block' => 'Dodaj blok',
-            'generate_seo' => 'Generuj z treści',
         ],
         'modals' => [
             'delete_confirm' => 'Czy na pewno chcesz usunąć tę stronę?',
             'publish_confirm' => 'Ta akcja nadpisze publiczną wersję strony aktualnym szkicem. Kontynuować?',
-            'generate_seo_confirm' => 'Obecny tytuł i opis SEO zostaną zastąpione. Zmiany zapiszą się dopiero po zapisaniu szkicu.',
         ],
         'notifications' => [
             'published' => 'Strona została pomyślnie opublikowana!',
-            'seo_generated' => 'Wygenerowano SEO. Sprawdź je i zapisz szkic.',
-            'seo_failed' => 'Nie udało się wygenerować SEO. Sprawdź ustawienia AI i spróbuj ponownie.',
-            'seo_unavailable' => 'Dostawca AI jest chwilowo niedostępny lub wyczerpano limit. Spróbuj ponownie później.',
-            'seo_no_content' => 'Strona nie ma jeszcze treści, z której można wygenerować SEO.',
         ],
         'placeholders' => [
             'none_root' => 'Brak (Strona główna)',
@@ -211,6 +205,15 @@ return [
         'apply' => 'Zastosuj',
         'reject' => 'Odrzuć',
         'apply_all' => 'Zastosuj wszystkie',
+        'quick_actions' => [
+            'seo' => ['label' => 'Uzupełnij SEO', 'prompt' => 'Uzupełnij tytuł i opis SEO na podstawie treści strony.'],
+            'translate_en' => ['label' => 'Na angielski', 'prompt' => 'Przetłumacz treść strony na angielski.'],
+            'translate_pl' => ['label' => 'Na polski', 'prompt' => 'Przetłumacz treść strony na polski.'],
+            'formal' => ['label' => 'Bardziej formalnie', 'prompt' => 'Napisz treść strony bardziej formalnie.'],
+            'casual' => ['label' => 'Mniej formalnie', 'prompt' => 'Napisz treść strony mniej formalnie.'],
+            'shorter' => ['label' => 'Skróć', 'prompt' => 'Skróć treść strony, zachowując najważniejsze informacje.'],
+            'correct' => ['label' => 'Popraw błędy', 'prompt' => 'Popraw błędy w treści strony, nie zmieniając niczego więcej.'],
+        ],
         'errors' => [
             'unavailable' => 'Dostawca AI jest chwilowo niedostępny lub wyczerpano limit. Spróbuj ponownie później.',
             'failed' => 'Nie udało się uzyskać odpowiedzi. Sprawdź ustawienia AI i spróbuj ponownie.',
