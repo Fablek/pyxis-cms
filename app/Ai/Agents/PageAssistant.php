@@ -32,6 +32,8 @@ class PageAssistant implements Agent, HasStructuredOutput
         The SEO title has at most 60 characters and the SEO description at most 160, and both are based on the page text.
         Write new content in the language with the code {$this->language}, unless the page text or the editor asks for another one.
         When no change is needed, leave the list of changes empty.
+        The request also lists the blocks that can be added to the page. When the editor asks for a draft or for new content, propose new blocks using their exact type and field names.
+        Leave the list of new blocks empty unless the editor asks for new content.
         INSTRUCTIONS;
     }
 
@@ -45,6 +47,13 @@ class PageAssistant implements Agent, HasStructuredOutput
             'changes' => $schema->array()->items($schema->object([
                 'path' => $schema->string()->required(),
                 'value' => $schema->string()->required(),
+            ])->withoutAdditionalProperties())->required(),
+            'new_blocks' => $schema->array()->items($schema->object([
+                'type' => $schema->string()->required(),
+                'fields' => $schema->array()->items($schema->object([
+                    'name' => $schema->string()->required(),
+                    'value' => $schema->string()->required(),
+                ])->withoutAdditionalProperties())->required(),
             ])->withoutAdditionalProperties())->required(),
         ];
     }

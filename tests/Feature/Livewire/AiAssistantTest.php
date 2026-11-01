@@ -11,6 +11,7 @@ use App\Services\AiSettings;
 use Laravel\Ai\Exceptions\ProviderOverloadedException;
 use Laravel\Ai\Prompts\AgentPrompt;
 use Livewire\Livewire;
+use Illuminate\Support\Facades\Lang;
 
 function enableAiAssistant(): void
 {
@@ -28,9 +29,9 @@ function assistantFields(): array
     return [['path' => 'data.title', 'label' => 'Tytuł', 'type' => 'text', 'value' => 'O nas']];
 }
 
-function assistantReply(array $changes = []): array
+function assistantReply(array $changes = [], array $newBlocks = []): array
 {
-    return ['message' => 'Gotowe', 'changes' => $changes];
+    return ['message' => 'Gotowe', 'changes' => $changes, 'new_blocks' => $newBlocks];
 }
 
 it('shows the assistant on the page form when ai is enabled', function () {
@@ -154,6 +155,26 @@ it('removes a rejected proposal without changing the form', function () {
         ->assertSet('proposals', []);
 });
 
+it('turns new blocks into proposals and drops unknown types and fields', function () {
+    enableAiAssistant();
+    $this->actingAs(User::factory()->create());
+    PageAssistant::fake([assistantReply(newBlocks: [
+        ['type' => 'tekst', 'fields' => [['name' => 'body', 'value' => 'Szkic'], ['name' => 'unknown', 'value' => 'X']]],
+        ['type' => 'unknown', 'fields' => [['name' => 'body', 'value' => 'Szkic']]],
+    ])]);
+
+    $blocks = [['type' => 'tekst', 'label' => 'Tekst', 'fields' => [['name' => 'body', 'label' => 'Treść', 'type' => 'html']]]];
+
+    Livewire::test(AiAssistant::class)
+        ->set('prompt', 'Napisz szkic')
+        ->call('send')
+        ->call('reply', assistantFields(), $blocks)
+        ->assertSet('blockProposals', [['type' => 'tekst', 'label' => 'Tekst', 'data' => ['body' => 'Szkic']]])
+        ->call('applyBlockProposal', 0)
+        ->assertDispatched('ai-assistant-block-accepted', type: 'tekst', data: ['body' => 'Szkic'])
+        ->assertSet('blockProposals', []);
+});
+
 it('rejects an empty message without asking for the fields', function () {
     enableAiAssistant();
     $this->actingAs(User::factory()->create());
@@ -189,6 +210,15 @@ it('shows a settings message when the provider call fails', function () {
         ->call('send')
         ->call('reply', assistantFields())
         ->assertSet('error', __('admin.ai_assistant.errors.failed'));
+});
+
+it('has a label and a prompt for every quick action in both languages', function () {
+    foreach (['pl', 'en'] as $locale) {
+        foreach (AssistantQuickAction::cases() as $action) {
+            expect(Lang::has("admin.ai_assistant.quick_actions.{$action->value}.label", $locale))->toBeTrue()
+                ->and(Lang::has("admin.ai_assistant.quick_actions.{$action->value}.prompt", $locale))->toBeTrue();
+        }
+    }
 });
 
 it('sends a quick action as a message', function () {

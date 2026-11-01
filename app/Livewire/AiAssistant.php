@@ -27,6 +27,12 @@ class AiAssistant extends Component
     #[Locked]
     public array $proposals = [];
 
+    /**
+     * @var array<int, array{type: string, label: string, data: array<string, string>}>
+     */
+    #[Locked]
+    public array $blockProposals = [];
+
     #[Locked]
     public bool $isWaitingForReply = false;
 
@@ -57,9 +63,10 @@ class AiAssistant extends Component
 
     /**
      * @param  array<int, array{path: string, label: string, type: string, value: string}>  $fields
+     * @param  array<int, array{type: string, label: string, fields: array<int, array{name: string, label: string, type: string}>}>  $blocks
      */
     #[On('ai-assistant-fields-provided')]
-    public function reply(array $fields): void
+    public function reply(array $fields, array $blocks = []): void
     {
         $this->ensureAvailable();
 
@@ -73,10 +80,11 @@ class AiAssistant extends Component
         }
 
         try {
-            $reply = app(PageAssistantChat::class)->reply($history, $lastMessage['content'], $fields);
+            $reply = app(PageAssistantChat::class)->reply($history, $lastMessage['content'], $fields, $blocks);
 
             $this->messages[] = ['role' => 'assistant', 'content' => $reply['message']];
             $this->proposals = $reply['proposals'];
+            $this->blockProposals = $reply['block_proposals'];
         } catch (FailoverableException $exception) {
             report($exception);
             $this->error = __('admin.ai_assistant.errors.unavailable');
@@ -101,7 +109,28 @@ class AiAssistant extends Component
             $this->dispatchAcceptedChange($proposal);
         }
 
+        foreach ($this->blockProposals as $blockProposal) {
+            $this->dispatchAcceptedBlock($blockProposal);
+        }
+
         $this->proposals = [];
+        $this->blockProposals = [];
+    }
+
+    public function applyBlockProposal(int $index): void
+    {
+        if (isset($this->blockProposals[$index])) {
+            $this->dispatchAcceptedBlock($this->blockProposals[$index]);
+        }
+
+        $this->rejectBlockProposal($index);
+    }
+
+    public function rejectBlockProposal(int $index): void
+    {
+        unset($this->blockProposals[$index]);
+
+        $this->blockProposals = array_values($this->blockProposals);
     }
 
     public function rejectProposal(int $index): void
@@ -120,6 +149,7 @@ class AiAssistant extends Component
     {
         $this->messages[] = ['role' => 'user', 'content' => $prompt];
         $this->proposals = [];
+        $this->blockProposals = [];
         $this->error = null;
         $this->isWaitingForReply = true;
 
@@ -132,6 +162,14 @@ class AiAssistant extends Component
     private function dispatchAcceptedChange(array $proposal): void
     {
         $this->dispatch('ai-assistant-change-accepted', path: $proposal['path'], value: $proposal['after']);
+    }
+
+    /**
+     * @param  array{type: string, label: string, data: array<string, string>}  $blockProposal
+     */
+    private function dispatchAcceptedBlock(array $blockProposal): void
+    {
+        $this->dispatch('ai-assistant-block-accepted', type: $blockProposal['type'], data: $blockProposal['data']);
     }
 
     private function ensureAvailable(): void

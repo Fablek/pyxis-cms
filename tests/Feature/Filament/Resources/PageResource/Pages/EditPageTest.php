@@ -209,3 +209,42 @@ it('ignores an accepted change of a field outside the assistant reach', function
         ->call('applyAiAssistantChange', 'data.slug', 'hacked')
         ->assertSchemaStateSet(['slug' => 'o-nas']);
 });
+
+it('offers the assistant the text fields of the available blocks', function () {
+    $page = Page::factory()->create();
+    heroGroupFor('page', $page->id)->update(['mode' => FieldGroupMode::BLOCK]);
+
+    Livewire::test(EditPage::class, ['record' => $page->getRouteKey()])
+        ->call('provideAiAssistantFields')
+        ->assertDispatched('ai-assistant-fields-provided', fn (string $event, array $params): bool => $params['blocks'] === [[
+            'type' => 'hero',
+            'label' => 'Hero',
+            'fields' => [['name' => 'title', 'label' => 'Nagłówek', 'type' => 'text']],
+        ]]);
+});
+
+it('adds an accepted block to the content without saving it', function () {
+    Builder::fake();
+
+    $page = Page::factory()->create(['content_draft' => []]);
+    heroGroupFor('page', $page->id)->update(['mode' => FieldGroupMode::BLOCK]);
+
+    $livewire = Livewire::test(EditPage::class, ['record' => $page->getRouteKey()])
+        ->call('addAiAssistantBlock', 'hero', ['title' => 'Szkic', 'unknown' => 'X']);
+
+    expect(array_values($livewire->get('data.content_draft')))->toBe([['type' => 'hero', 'data' => ['title' => 'Szkic']]])
+        ->and($page->fresh()->content_draft)->toBe([]);
+
+    $livewire->call('save')->assertHasNoFormErrors();
+
+    expect($page->fresh()->content_draft)->toBe([['type' => 'hero', 'data' => ['title' => 'Szkic']]]);
+});
+
+it('ignores an accepted block of an unavailable type', function () {
+    $page = Page::factory()->create(['content_draft' => []]);
+
+    $livewire = Livewire::test(EditPage::class, ['record' => $page->getRouteKey()])
+        ->call('addAiAssistantBlock', 'hero', ['title' => 'Szkic']);
+
+    expect($livewire->get('data.content_draft'))->toBe([]);
+});

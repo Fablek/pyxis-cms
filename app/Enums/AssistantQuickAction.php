@@ -5,6 +5,7 @@ namespace App\Enums;
 enum AssistantQuickAction: string
 {
     case SEO = 'seo';
+    case SUMMARY = 'summary';
     case TRANSLATE_EN = 'translate_en';
     case TRANSLATE_PL = 'translate_pl';
     case FORMAL = 'formal';

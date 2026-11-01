@@ -205,8 +205,10 @@ return [
         'apply' => 'Apply',
         'reject' => 'Reject',
         'apply_all' => 'Apply all',
+        'new_block' => 'New block: :label',
         'quick_actions' => [
             'seo' => ['label' => 'Fill in SEO', 'prompt' => 'Fill in the SEO title and description based on the page content.'],
+            'summary' => ['label' => 'Summarize', 'prompt' => 'Write a short summary of the page content and give it in your reply, without changing any fields.'],
             'translate_en' => ['label' => 'To English', 'prompt' => 'Translate the page content into English.'],
             'translate_pl' => ['label' => 'To Polish', 'prompt' => 'Translate the page content into Polish.'],
             'formal' => ['label' => 'More formal', 'prompt' => 'Rewrite the page content in a more formal style.'],

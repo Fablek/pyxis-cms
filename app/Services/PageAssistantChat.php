@@ -17,9 +17,10 @@ class PageAssistantChat
     /**
      * @param  array<int, array{role: string, content: string}>  $history
      * @param  array<int, array{path: string, label: string, type: string, value: string}>  $fields
-     * @return array{message: string, proposals: array<int, array{path: string, label: string, before: string, after: string}>}
+     * @param  array<int, array{type: string, label: string, fields: array<int, array{name: string, label: string, type: string}>}>  $blocks
+     * @return array{message: string, proposals: array<int, array{path: string, label: string, before: string, after: string}>, block_proposals: array<int, array{type: string, label: string, data: array<string, string>}>}
      */
-    public function reply(array $history, string $prompt, array $fields): array
+    public function reply(array $history, string $prompt, array $fields, array $blocks = []): array
     {
         $this->aiSettings->configureProvider();
 
@@ -27,7 +28,9 @@ class PageAssistantChat
             ->withMessages(array_slice($history, -self::MAX_HISTORY_MESSAGES));
 
         $response = $assistant->prompt(
-            'Page fields: '.json_encode($fields, JSON_UNESCAPED_UNICODE)."\n\nEditor's request: {$prompt}",
+            'Page fields: '.json_encode($fields, JSON_UNESCAPED_UNICODE)
+                ."\n\nBlocks that can be added: ".json_encode($blocks, JSON_UNESCAPED_UNICODE)
+                ."\n\nEditor's request: {$prompt}",
             provider: $this->aiSettings->provider(),
             model: $this->aiSettings->model() ?: null,
         );
@@ -35,6 +38,7 @@ class PageAssistantChat
         return [
             'message' => $response['message'],
             'proposals' => $this->proposals($response['changes'], $fields),
+            'block_proposals' => $this->blockProposals($response['new_blocks'], $blocks),
         ];
     }
 
@@ -59,6 +63,32 @@ class PageAssistantChat
                 'before' => $fieldsByPath[$change['path']]['value'],
                 'after' => $change['value'],
             ])
+            ->values()
+            ->all();
+    }
+
+    /**
+     * Keeps only new blocks of the available types, with the fields those types have.
+     *
+     * @param  array<int, array{type: string, fields: array<int, array{name: string, value: string}>}>  $newBlocks
+     * @param  array<int, array{type: string, label: string, fields: array<int, array{name: string, label: string, type: string}>}>  $blocks
+     * @return array<int, array{type: string, label: string, data: array<string, string>}>
+     */
+    private function blockProposals(array $newBlocks, array $blocks): array
+    {
+        $blocksByType = array_column($blocks, null, 'type');
+
+        return collect($newBlocks)
+            ->filter(fn (array $block): bool => isset($blocksByType[$block['type']]))
+            ->map(fn (array $block): array => [
+                'type' => $block['type'],
+                'label' => $blocksByType[$block['type']]['label'],
+                'data' => array_intersect_key(
+                    array_column($block['fields'], 'value', 'name'),
+                    array_flip(array_column($blocksByType[$block['type']]['fields'], 'name')),
+                ),
+            ])
+            ->filter(fn (array $block): bool => filled($block['data']))
             ->values()
             ->all();
     }

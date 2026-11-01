@@ -66,7 +66,25 @@
             </div>
         @endforeach
 
-        @if (count($proposals) > 1)
+        @foreach ($blockProposals as $index => $blockProposal)
+            <div wire:key="ai-block-proposal-{{ $index }}" class="rounded-lg border border-gray-200 p-3 dark:border-white/10">
+                <p class="font-semibold text-gray-900 dark:text-white">{{ __('admin.ai_assistant.new_block', ['label' => $blockProposal['label']]) }}</p>
+
+                <p class="mt-2 whitespace-pre-wrap text-gray-900 dark:text-white">{{ strip_tags(implode("\n", $blockProposal['data'])) }}</p>
+
+                <div class="mt-3 flex gap-2">
+                    <x-filament::button size="xs" wire:click="applyBlockProposal({{ $index }})">
+                        {{ __('admin.ai_assistant.apply') }}
+                    </x-filament::button>
+
+                    <x-filament::button size="xs" color="gray" wire:click="rejectBlockProposal({{ $index }})">
+                        {{ __('admin.ai_assistant.reject') }}
+                    </x-filament::button>
+                </div>
+            </div>
+        @endforeach
+
+        @if (count($proposals) + count($blockProposals) > 1)
             <x-filament::button size="sm" class="self-start" wire:click="applyAllProposals">
                 {{ __('admin.ai_assistant.apply_all') }}
             </x-filament::button>

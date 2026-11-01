@@ -205,8 +205,10 @@ return [
         'apply' => 'Zastosuj',
         'reject' => 'Odrzuć',
         'apply_all' => 'Zastosuj wszystkie',
+        'new_block' => 'Nowy blok: :label',
         'quick_actions' => [
             'seo' => ['label' => 'Uzupełnij SEO', 'prompt' => 'Uzupełnij tytuł i opis SEO na podstawie treści strony.'],
+            'summary' => ['label' => 'Podsumuj', 'prompt' => 'Napisz krótkie podsumowanie treści strony i podaj je w odpowiedzi, bez zmian w polach.'],
             'translate_en' => ['label' => 'Na angielski', 'prompt' => 'Przetłumacz treść strony na angielski.'],
             'translate_pl' => ['label' => 'Na polski', 'prompt' => 'Przetłumacz treść strony na polski.'],
             'formal' => ['label' => 'Bardziej formalnie', 'prompt' => 'Napisz treść strony bardziej formalnie.'],
