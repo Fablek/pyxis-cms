@@ -2,11 +2,11 @@
 
 use App\Enums\PageStatus;
 use App\Enums\PageVisibility;
-use App\Plugins\Hook;
 use App\Models\FieldGroup;
 use App\Models\Page;
 use App\Models\Role;
 use App\Models\Setting;
+use App\Plugins\Hook;
 
 function heroFieldGroup(array $fields = [['type' => 'text', 'label' => 'Tytuł', 'name' => 'title']]): FieldGroup
 {
@@ -236,4 +236,45 @@ it('lets plugins filter the page api response', function () {
     $this->getJson('/api/pages/kontakt')
         ->assertOk()
         ->assertJsonPath('data.title_length', 7);
+});
+
+it('returns the published seo with the share image as media', function () {
+    Storage::fake('public');
+    $image = storedImage('og', 'Okładka');
+
+    Page::factory()->create([
+        'slug' => 'kontakt',
+        'seo' => ['title' => 'Opublikowany', 'description' => 'Opis', 'og_image' => $image->id, 'noindex' => true],
+        'seo_draft' => ['title' => 'Szkic'],
+    ]);
+
+    $this->getJson('/api/pages/kontakt')
+        ->assertOk()
+        ->assertJsonPath('data.seo.title', 'Opublikowany')
+        ->assertJsonPath('data.seo.description', 'Opis')
+        ->assertJsonPath('data.seo.og_image.id', $image->id)
+        ->assertJsonPath('data.seo.og_image.alt', 'Okładka')
+        ->assertJsonPath('data.seo.noindex', true);
+});
+
+it('returns the draft seo in preview mode', function () {
+    Page::factory()->create([
+        'slug' => 'kontakt',
+        'seo' => ['title' => 'Opublikowany'],
+        'seo_draft' => ['title' => 'Szkic'],
+    ]);
+
+    $this->getJson('/api/pages/kontakt', [
+        config('pyxis.preview.header') => encrypt(config('pyxis.preview.secret')),
+    ])
+        ->assertOk()
+        ->assertJsonPath('data.seo.title', 'Szkic');
+});
+
+it('returns empty seo when the page has none', function () {
+    Page::factory()->create(['slug' => 'kontakt']);
+
+    $this->getJson('/api/pages/kontakt')
+        ->assertOk()
+        ->assertJsonPath('data.seo', ['title' => null, 'description' => null, 'og_image' => null, 'noindex' => false]);
 });

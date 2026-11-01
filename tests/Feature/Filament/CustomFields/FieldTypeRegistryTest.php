@@ -1,30 +1,11 @@
 <?php
 
 use App\Filament\CustomFields\FieldTypeRegistry;
-use App\Models\Media;
 use Illuminate\Support\Facades\Storage;
 
 beforeEach(function () {
     Storage::fake('public');
 });
-
-function storedImage(string $name, string $alt): Media
-{
-    Storage::disk('public')->put("media/{$name}.jpg", 'image');
-
-    return Media::create([
-        'disk' => 'public',
-        'directory' => 'media',
-        'visibility' => 'public',
-        'name' => $name,
-        'path' => "media/{$name}.jpg",
-        'type' => 'image/jpeg',
-        'ext' => 'jpg',
-        'alt' => $alt,
-        'width' => 1920,
-        'height' => 1080,
-    ]);
-}
 
 it('returns an image as an object with its url and description', function () {
     $image = storedImage('tlo', 'Biuro');

@@ -7,6 +7,10 @@ use App\Enums\PageVisibility;
 use App\Filament\Resources\PageResource\Pages;
 use App\Filament\CustomFields\PageFieldsForm;
 use App\Filament\CustomFields\PageContentBuilder;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\Toggle;
+use App\Filament\CustomFields\FieldTypes\ImageField;
+use Awcodes\Curator\Components\Forms\CuratorPicker;
 use App\Models\Page;
 use App\Models\Setting;
 use App\Plugins\Hook;
@@ -174,6 +178,7 @@ class PageResource extends Resource
                                         $record->update([
                                             'content' => $record->content_draft,
                                             'fields' => $record->fields_draft,
+                                            'seo' => $record->seo_draft,
                                             'status' => PageStatus::PUBLISHED,
                                         ]);
                                     
@@ -215,6 +220,35 @@ class PageResource extends Resource
                                 ->placeholder(__('admin.pages.placeholders.none_root'))
                                 ->live(),
                         ])
+                        ->columns(1),
+                    
+                    Section::make(__('admin.pages.sections.seo'))
+                        ->schema([
+                            TextInput::make('seo_draft.title')
+                                ->label(__('admin.pages.fields.seo_title'))
+                                ->placeholder(fn (Get $get): ?string => $get('title'))
+                                ->maxLength(255)
+                                ->live(debounce: 500)
+                                ->hint(fn (?string $state): string => mb_strlen((string) $state).' / 60')
+                                ->helperText(__('admin.pages.helpers.seo_title')),
+
+                            Textarea::make('seo_draft.description')
+                                ->label(__('admin.pages.fields.seo_description'))
+                                ->rows(3)
+                                ->maxLength(500)
+                                ->live(debounce: 500)
+                                ->hint(fn (?string $state): string => mb_strlen((string) $state).' / 160')
+                                ->helperText(__('admin.pages.helpers.seo_description')),
+
+                            CuratorPicker::make('seo_draft.og_image')
+                                ->label(__('admin.pages.fields.seo_og_image'))
+                                ->helperText(__('admin.pages.helpers.seo_og_image')),
+
+                            Toggle::make('seo_draft.noindex')
+                                ->label(__('admin.pages.fields.seo_noindex'))
+                                ->helperText(__('admin.pages.helpers.seo_noindex')),
+                        ])
+                        ->collapsible()
                         ->columns(1),
                 ])
                 ->columnSpan([
@@ -310,6 +344,22 @@ class PageResource extends Resource
             'index' => Pages\ListPages::route('/'),
             'create' => Pages\CreatePage::route('/create'),
             'edit' => Pages\EditPage::route('/{record}/edit'),
+        ];
+    }
+
+    /**
+     * SEO metadata in a fixed shape; the share image is returned like an image field.
+     *
+     * @param  array<string, mixed>|null  $seo
+     * @return array{title: ?string, description: ?string, og_image: ?array<string, mixed>, noindex: bool}
+     */
+    protected function seoForApi(?array $seo): array
+    {
+        return [
+            'title' => $seo['title'] ?? null,
+            'description' => $seo['description'] ?? null,
+            'og_image' => (new ImageField)->toApi($seo['og_image'] ?? null, []),
+            'noindex' => (bool) ($seo['noindex'] ?? false),
         ];
     }
 }

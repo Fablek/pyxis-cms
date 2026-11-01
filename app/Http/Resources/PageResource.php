@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use App\Enums\PageVisibility;
+use App\Filament\CustomFields\FieldTypes\ImageField;
 use App\Models\Setting;
 use App\Plugins\Hook;
 use App\Services\FieldValuesPresenter;
@@ -39,7 +40,7 @@ class PageResource extends JsonResource
             'fields' => $shouldHideContent
                 ? null
                 : $presenter->staticFields($isPreview ? ($this->fields_draft ?? $this->fields) : $this->fields),
-            'seo' => $this->seo,
+            'seo' => $this->seoForApi($isPreview ? ($this->seo_draft ?? $this->seo) : $this->seo),
             'full_url' => $isHomepage ? '/' : $this->full_url,
             'published_at' => $this->published_at,
             'is_password_protected' => $isProtected,
@@ -47,5 +48,21 @@ class PageResource extends JsonResource
         ];
 
         return Hook::applyFilters('page.api', $data, $this->resource, $request);
+    }
+
+    /**
+     * SEO metadata in a fixed shape; the share image is returned like an image field.
+     *
+     * @param  array<string, mixed>|null  $seo
+     * @return array{title: ?string, description: ?string, og_image: ?array<string, mixed>, noindex: bool}
+     */
+    protected function seoForApi(?array $seo): array
+    {
+        return [
+            'title' => $seo['title'] ?? null,
+            'description' => $seo['description'] ?? null,
+            'og_image' => (new ImageField)->toApi($seo['og_image'] ?? null, []),
+            'noindex' => (bool) ($seo['noindex'] ?? false),
+        ];
     }
 }

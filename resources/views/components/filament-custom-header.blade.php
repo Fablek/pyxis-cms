@@ -39,16 +39,23 @@
             <div class="h-4 w-px bg-gray-200 dark:bg-white/10 mx-1"></div>
         @endif
 
-        {{-- Dodatkowy przycisk (np. Feedback/Support) --}}
-        <button class="flex h-8 w-8 items-center justify-center rounded-lg text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12 6V2H8"></path>
-                <path d="m8 18-4 4V8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2Z"></path>
-                <path d="M2 12h2"></path>
-                <path d="M9 11v2"></path>
-                <path d="M15 11v2"></path>
-                <path d="M20 12h2"></path>
-            </svg>
-        </button>
+        @if ($aiAssistant)
+            <button
+                type="button"
+                x-on:click="$dispatch('ai-assistant-toggle')"
+                aria-label="{{ __('admin.ai_assistant.title') }}"
+                title="{{ __('admin.ai_assistant.title') }}"
+                class="flex h-8 w-8 items-center justify-center rounded-lg text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 6V2H8"></path>
+                    <path d="m8 18-4 4V8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2Z"></path>
+                    <path d="M2 12h2"></path>
+                    <path d="M9 11v2"></path>
+                    <path d="M15 11v2"></path>
+                    <path d="M20 12h2"></path>
+                </svg>
+            </button>
+        @endif
     </div>
 </header>

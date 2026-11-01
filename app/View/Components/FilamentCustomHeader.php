@@ -3,6 +3,9 @@
 namespace App\View\Components;
 
 use Closure;
+use App\Filament\Resources\PageResource\Pages\CreatePage;
+use App\Filament\Resources\PageResource\Pages\EditPage;
+use App\Services\AiSettings;
 use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
 use Livewire\Livewire;
@@ -11,6 +14,7 @@ class FilamentCustomHeader extends Component
 {
     public string $heading = 'Dashboard';
     public array $headerActions = [];
+    public bool $aiAssistant = false;
 
     /**
      * Create a new component instance.
@@ -38,6 +42,10 @@ class FilamentCustomHeader extends Component
             if (method_exists($page, 'getCachedHeaderActions')) {
                 $this->headerActions = $page->getCachedHeaderActions();
             }
+
+            // Only the page form has content the assistant can work with
+            $this->aiAssistant = ($page instanceof EditPage || $page instanceof CreatePage)
+                && app(AiSettings::class)->isEnabled();
         }
     }
 

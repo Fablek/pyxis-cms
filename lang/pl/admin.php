@@ -8,6 +8,7 @@ return [
             'publish' => 'Publikacja i widoczność',
             'attributes' => 'Atrybuty strony',
             'content' => 'Treść strony',
+            'seo' => 'SEO',
         ],
         'fields' => [
             'title' => 'Tytuł',
@@ -19,6 +20,10 @@ return [
             'parent' => 'Strona nadrzędna',
             'author' => 'Autor',
             'content_draft' => 'Treść strony',
+            'seo_title' => 'Tytuł SEO',
+            'seo_description' => 'Opis SEO',
+            'seo_og_image' => 'Obrazek udostępniania',
+            'seo_noindex' => 'Ukryj przed wyszukiwarkami',
         ],
         'status' => [
             'draft' => 'Szkic',
@@ -50,6 +55,12 @@ return [
         ],
         'placeholders' => [
             'none_root' => 'Brak (Strona główna)',
+        ],
+        'helpers' => [
+            'seo_title' => 'Zalecane do 60 znaków. Puste – zostanie użyty tytuł strony.',
+            'seo_description' => 'Zalecane do 160 znaków. Pokazywany w wynikach wyszukiwania.',
+            'seo_og_image' => 'Obrazek wyświetlany przy udostępnianiu strony (Open Graph), np. 1200×630 px.',
+            'seo_noindex' => 'Wyszukiwarki nie będą indeksować tej strony.',
         ],
     ],
     'nav' => [
@@ -86,59 +97,27 @@ return [
         'sections' => [
             'config' => 'Główna konfiguracja',
             'config_desc' => 'Zarządzaj podstawowymi parametrami strony, takimi jak język domyślny i strona główna.',
+            'ai' => 'Sztuczna inteligencja',
+            'ai_desc' => 'Dostawca i klucz API używane przez funkcje AI w panelu.',
         ],
 
         'fields' => [
             'language' => 'Język strony',
             'homepage' => 'Strona główna',
+            'ai_enabled' => 'Włącz funkcje AI',
+            'ai_provider' => 'Dostawca',
+            'ai_model' => 'Model',
+            'ai_api_key' => 'Klucz API',
         ],
 
         'placeholders' => [
             'select_page' => 'Wybierz stronę z listy...',
-        ],
-    ],
-    'nav' => [
-        'users' => 'Użytkownicy',
-        'settings' => 'Ustawienia',
-        'pages' => 'Strony',
-    ],
-    'users' => [
-        'label' => 'Użytkownik',
-        'plural_label' => 'Użytkownicy',
-        'sections' => [
-            'basic_data' => 'Dane podstawowe',
-            'security' => 'Bezpieczeństwo',
-        ],
-        'fields' => [
-            'name' => 'Imię i nazwisko',
-            'email' => 'Adres e-mail',
-            'role' => 'Rola systemowa',
-            'password' => 'Hasło',
-            'created_at' => 'Data utworzenia',
-        ],
-    ],
-    'roles' => [
-        'admin' => 'Administrator',
-        'editor' => 'Redaktor',
-    ],
-    'settings' => [
-        'navigation_label' => 'Ustawienia',
-        'title' => 'Ustawienia systemu',
-        'save_button' => 'Zapisz zmiany',
-        'notification_success' => 'Ustawienia zostały pomyślnie zapisane.',
-
-        'sections' => [
-            'config' => 'Konfiguracja główna',
-            'config_desc' => 'Zarządzaj podstawowymi parametrami witryny, takimi jak język domyślny oraz strona główna.',
+            'ai_model' => 'Domyślny model dostawcy',
         ],
 
-        'fields' => [
-            'language' => 'Język witryny',
-            'homepage' => 'Strona główna serwisu',
-        ],
-
-        'placeholders' => [
-            'select_page' => 'Wybierz stronę z listy...',
+        'helpers' => [
+            'ai_api_key' => 'Klucz jest przechowywany w bazie w postaci zaszyfrowanej.',
+            'ai_api_key_saved' => 'Klucz jest zapisany. Zostaw pole puste, aby go nie zmieniać.',
         ],
     ],
     'media' => [
@@ -212,6 +191,34 @@ return [
             'description' => 'Tak redaktor zobaczy te pola podczas edycji strony. Wartości nie są zapisywane.',
             'close' => 'Zamknij',
             'empty' => 'Brak pól do wyświetlenia. Dodaj pole i uzupełnij jego nazwę.',
+        ],
+    ],
+    'ai_assistant' => [
+        'title' => 'Asystent AI',
+        'close' => 'Zamknij asystenta',
+        'empty' => 'Napisz, w czym mogę pomóc przy tej stronie.',
+        'placeholder' => 'Co mam zrobić?',
+        'send' => 'Wyślij',
+        'thinking' => 'Asystent pisze...',
+        'before' => 'Było',
+        'after' => 'Będzie',
+        'apply' => 'Zastosuj',
+        'reject' => 'Odrzuć',
+        'apply_all' => 'Zastosuj wszystkie',
+        'new_block' => 'Nowy blok: :label',
+        'quick_actions' => [
+            'seo' => ['label' => 'Uzupełnij SEO', 'prompt' => 'Uzupełnij tytuł i opis SEO na podstawie treści strony.'],
+            'summary' => ['label' => 'Podsumuj', 'prompt' => 'Napisz krótkie podsumowanie treści strony i podaj je w odpowiedzi, bez zmian w polach.'],
+            'translate_en' => ['label' => 'Na angielski', 'prompt' => 'Przetłumacz treść strony na angielski.'],
+            'translate_pl' => ['label' => 'Na polski', 'prompt' => 'Przetłumacz treść strony na polski.'],
+            'formal' => ['label' => 'Bardziej formalnie', 'prompt' => 'Napisz treść strony bardziej formalnie.'],
+            'casual' => ['label' => 'Mniej formalnie', 'prompt' => 'Napisz treść strony mniej formalnie.'],
+            'shorter' => ['label' => 'Skróć', 'prompt' => 'Skróć treść strony, zachowując najważniejsze informacje.'],
+            'correct' => ['label' => 'Popraw błędy', 'prompt' => 'Popraw błędy w treści strony, nie zmieniając niczego więcej.'],
+        ],
+        'errors' => [
+            'unavailable' => 'Dostawca AI jest chwilowo niedostępny lub wyczerpano limit. Spróbuj ponownie później.',
+            'failed' => 'Nie udało się uzyskać odpowiedzi. Sprawdź ustawienia AI i spróbuj ponownie.',
         ],
     ],
     'custom_fields' => [

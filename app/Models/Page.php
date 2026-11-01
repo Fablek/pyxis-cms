@@ -29,6 +29,7 @@ class Page extends Model
         'fields',
         'fields_draft',
         'seo',
+        'seo_draft',
         'status',
         'visibility',
         'password',
@@ -45,6 +46,7 @@ class Page extends Model
         'fields' => 'array',
         'fields_draft' => 'array',
         'seo' => 'array',
+        'seo_draft' => 'array',
         'published_at' => 'datetime',
     ];
 
