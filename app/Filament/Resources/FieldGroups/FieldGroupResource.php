@@ -22,6 +22,14 @@ class FieldGroupResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'title';
 
+    /**
+     * Field groups define the content schema the frontends rely on, so only admins change them.
+     */
+    public static function canAccess(): bool
+    {
+        return auth()->user()?->isAdmin() ?? false;
+    }
+
     public static function getNavigationLabel(): string
     {
         return __('admin.field_groups.nav_label');

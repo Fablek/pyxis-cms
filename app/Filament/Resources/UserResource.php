@@ -21,6 +21,14 @@ class UserResource extends Resource
 
     protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-users';
 
+    /**
+     * User accounts and roles are managed only by admins, so an editor cannot give themselves more access.
+     */
+    public static function canAccess(): bool
+    {
+        return auth()->user()?->isAdmin() ?? false;
+    }
+
     public static function getNavigationLabel(): string
     {
         return __('admin.nav.users');

@@ -10,7 +10,7 @@ use Filament\Forms\Components\TextInput;
 use Livewire\Livewire;
 
 beforeEach(function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->admin()->create());
 
     Repeater::fake();
 });

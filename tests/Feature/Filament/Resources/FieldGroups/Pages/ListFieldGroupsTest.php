@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\FieldGroupMode;
+use App\Filament\Resources\FieldGroups\FieldGroupResource;
 use App\Filament\Resources\FieldGroups\Pages\ListFieldGroups;
 use App\Models\FieldGroup;
 use App\Models\Page;
@@ -8,7 +9,7 @@ use App\Models\User;
 use Livewire\Livewire;
 
 beforeEach(function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAs(User::factory()->admin()->create());
 });
 
 function groupForPage(Page $page, FieldGroupMode $mode = FieldGroupMode::STATIC): FieldGroup
@@ -18,6 +19,16 @@ function groupForPage(Page $page, FieldGroupMode $mode = FieldGroupMode::STATIC)
         'rules' => [['conditions' => [['param' => 'page', 'operator' => '==', 'value' => $page->id]]]],
     ]);
 }
+
+it('is available only to admins', function () {
+    $this->actingAs(User::factory()->create())
+        ->get(FieldGroupResource::getUrl())
+        ->assertForbidden();
+
+    $this->actingAs(User::factory()->admin()->create())
+        ->get(FieldGroupResource::getUrl())
+        ->assertSuccessful();
+});
 
 it('shows only groups of the selected usage tab', function (string $tab, FieldGroupMode $visibleMode) {
     $page = Page::factory()->create();
