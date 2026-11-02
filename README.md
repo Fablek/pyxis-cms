@@ -1,59 +1,87 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Pyxis CMS
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A headless CMS with an admin panel, a REST API for separate frontends, a plugin system and a built-in AI assistant.
 
-## About Laravel
+Pyxis CMS is an engineering thesis project developed at the **Silesian University of Technology** (Computer Science, 2025/2026) by Sebastian Pytka, supervised by dr inż. Sebastian Pabiasz.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Features
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- **Custom fields and a block builder** – field groups defined in the panel, assigned to pages by location rules, used as static fields or as content blocks.
+- **Headless REST API** – pages served as structured JSON. Published content is public, the draft preview requires a preview token.
+- **Draft and publish** – every page keeps an edited draft of its content, fields and SEO next to the published version (Shadow Content).
+- **SEO** – title, description, share image and `noindex` per page, returned by the API in a fixed shape.
+- **Plugins** – extensions in `py-content/plugins`, loaded without changes to the core, with actions and filters (hooks). Example plugins: `hello-pyxis` and `pyxis-forms` (contact forms).
+- **AI assistant** – a side panel in the page form that drafts new blocks, summarizes the page, fills in SEO, translates and changes the style of texts. The editor applies or rejects each proposed change before saving the draft.
+- **Roles** – administrators manage users, field groups, plugins and AI settings; editors work with the content.
+- **Cache revalidation** – after publishing, the frontends are asked to refresh the changed paths.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Tech stack
 
-## Learning Laravel
+- PHP 8.4, Laravel 12, Filament 5, Livewire 4
+- PostgreSQL 16 (JSONB columns, UUID keys)
+- `laravel/ai` for the AI providers (Anthropic, OpenAI, Google Gemini, Mistral)
+- Pest for tests
+- Docker Compose for the development environment
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+## Related repositories
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+| Repository | Description |
+| :--- | :--- |
+| [pyxis-cms-docs](https://github.com/Fablek/pyxis-cms-docs) | Documentation (Astro Starlight, Polish and English) – the specification of the system |
+| [pyxis-view-next](https://github.com/Fablek/pyxis-view-next) | Next.js starter frontend |
+| [pyxis-view-astro](https://github.com/Fablek/pyxis-view-astro) | Astro starter frontend |
 
-## Laravel Sponsors
+## Getting started
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+Requirements: Docker with Docker Compose, and PHP 8.4, Composer and Node.js on the host (for building the panel assets and running the tests).
 
-### Premium Partners
+1. Create the shared Docker network used by the backend and the frontends:
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+   ```bash
+   docker network create pyxis-network
+   ```
+
+2. Create the environment file and set the frontend variables (`FRONTEND_URL`, `REVALIDATE_URLS`, `REVALIDATE_TOKEN`), described in the [environment variables](https://github.com/Fablek/pyxis-cms-docs/blob/main/src/content/docs/en/architecture/env.md) page:
+
+   ```bash
+   cp .env.example .env
+   ```
+
+   The database connection is set by `docker-compose.yml`.
+
+3. Install the dependencies and build the panel assets:
+
+   ```bash
+   composer install
+   npm install
+   npm run build
+   ```
+
+4. Start the containers and prepare the application:
+
+   ```bash
+   docker compose up -d --build
+   docker exec pyxis-admin php artisan key:generate
+   docker exec pyxis-admin php artisan migrate --seed
+   docker exec pyxis-admin php artisan storage:link
+   ```
+
+The panel is available at [http://localhost:8000](http://localhost:8000) and the API at `http://localhost:8000/api`. The seeder creates the administrator and editor roles and an administrator account (see `database/seeders/DatabaseSeeder.php`); change its password after the first sign-in.
+
+To use the AI assistant, an administrator enables AI in **Settings**, selects a provider and enters its API key. The key is stored encrypted.
+
+## Tests
+
+Run the tests on the host. They use an in-memory SQLite database:
+
+```bash
+php artisan test --compact
+```
+
+Do not run them inside the `pyxis-admin` container. Its environment points to the development PostgreSQL database, and the tests would erase it.
 
 ## Contributing
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+The repository uses Git Flow (`main`, `develop`, `feature/*`, `release/*`, `hotfix/*`, version tags such as `1.6.0`) and Conventional Commits (`feat:`, `fix:`, `docs:` and others). Code style is checked with Laravel Pint.
 
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+The documentation is the specification: a change to documented behavior also updates the Polish and English pages in `pyxis-cms-docs`.
