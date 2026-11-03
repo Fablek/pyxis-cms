@@ -66,6 +66,12 @@ Requirements: Docker with Docker Compose, and PHP 8.4, Composer and Node.js on t
    docker exec pyxis-admin php artisan storage:link
    ```
 
+5. Optionally, add the demo content – a sample site presenting Pyxis CMS (fresh installation only):
+
+   ```bash
+   docker exec pyxis-admin php artisan db:seed --class=DemoContentSeeder
+   ```
+
 The panel is available at [http://localhost:8000](http://localhost:8000) and the API at `http://localhost:8000/api`. The seeder creates the administrator and editor roles and an administrator account (see `database/seeders/DatabaseSeeder.php`); change its password after the first sign-in.
 
 To use the AI assistant, an administrator enables AI in **Settings**, selects a provider and enters its API key. The key is stored encrypted.
