@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Api\PageController;
+use App\Http\Controllers\Api\SiteController;
 use App\Http\Controllers\Api\PreviewController;
 use App\Http\Middleware\CheckPreviewToken;
 use Illuminate\Support\Facades\Route;
@@ -13,3 +14,5 @@ Route::get('/pages/{slug?}', [PageController::class, 'show'])
     ->where('slug', '.*');
 
 Route::get('/preview/verify', [PreviewController::class, 'verify']);
+
+Route::get('/site', [SiteController::class, 'show']);
